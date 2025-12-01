@@ -1,0 +1,77 @@
+[
+  {
+    "id": null,
+    "name": "Pasta z tuńczykiem i awokado",
+    "category": "snack",
+    "prep_time_minutes": 15,
+    "servings": 1,
+    "ingredients": [
+      {"name": "jajka", "amount": 4, "unit": "szt", "notes": "ugotowane na twardo"},
+      {"name": "tuńczyk w sosie własnym", "amount": 100, "unit": "g", "notes": null},
+      {"name": "twaróg chudy", "amount": 250, "unit": "g", "notes": null},
+      {"name": "awokado", "amount": 1, "unit": "szt", "notes": "dojrzałe"},
+      {"name": "szczypiorek", "amount": 3, "unit": "łyżka", "notes": "posiekany"},
+      {"name": "oliwa z oliwek", "amount": 2.5, "unit": "łyżka", "notes": null},
+      {"name": "sok z cytryny", "amount": 0, "unit": "do_smaku", "notes": null},
+      {"name": "chili lub ostra papryka", "amount": 0, "unit": "do_smaku", "notes": null},
+      {"name": "sól", "amount": 0, "unit": "do_smaku", "notes": null},
+      {"name": "pieprz", "amount": 0, "unit": "do_smaku", "notes": null}
+    ],
+    "instructions": [
+      "Ugotuj jajka na twardo (ok. 10 minut) i ostudź",
+      "Obierz awokado, wyjmij pestkę i miąższ przełóż do miski",
+      "Dodaj odcedzony tuńczyk, twaróg i posiekane jajka",
+      "Rozgnieć wszystko widelcem do uzyskania jednolitej, lekko grudkowatej masy",
+      "Dodaj posiekany szczypiorek i oliwę z oliwek",
+      "Dopraw sokiem z cytryny, chili lub ostrą papryką, solą i świeżo mielonym pieprzem do smaku",
+      "Wymieszaj dokładnie i podawaj jako pastę do pieczywa lub dietetyczną przekąskę"
+    ],
+    "nutrition_per_serving": {
+      "calories": 1057,
+      "protein_g": 98,
+      "fat_g": 66,
+      "carbs_g": 22
+    },
+    "tags": ["wysokobiałkowy", "zdrowe tłuszcze", "meal-prep", "bez gotowania"],
+    "source": "instagram",
+    "notes": "Podane makro (1053 kcal) jest zbieżne z obliczonym (1057 kcal) - wartości zweryfikowane poprawnie."
+  },
+  {
+    "id": null,
+    "name": "Jajka po turecku (Çılbır)",
+    "category": "breakfast",
+    "prep_time_minutes": 15,
+    "servings": 1,
+    "ingredients": [
+      {"name": "jogurt grecki naturalny", "amount": 3, "unit": "łyżka", "notes": null},
+      {"name": "czosnek", "amount": 1, "unit": "szt", "notes": "ząbek"},
+      {"name": "sok z cytryny lub limonki", "amount": 1, "unit": "łyżeczka", "notes": null},
+      {"name": "sól", "amount": 0, "unit": "do_smaku", "notes": null},
+      {"name": "pieprz", "amount": 0, "unit": "do_smaku", "notes": null},
+      {"name": "masło", "amount": 1, "unit": "łyżka", "notes": null},
+      {"name": "ostra papryka", "amount": 1, "unit": "łyżeczka", "notes": null},
+      {"name": "sól", "amount": 1, "unit": "szczypta", "notes": "do masła"},
+      {"name": "jajka", "amount": 2, "unit": "szt", "notes": "poche"},
+      {"name": "koperek", "amount": 0, "unit": "do_smaku", "notes": "świeży"}
+    ],
+    "instructions": [
+      "Wymieszaj jogurt grecki z przeciśniętym czosnkiem i sokiem z cytryny lub limonki",
+      "Dopraw jogurt solą i pieprzem do smaku, odstaw",
+      "Zagotuj wodę z odrobiną octu i ugotuj jajka w stylu poche (3-4 minuty)",
+      "W małej patelni rozgrzej masło, dodaj ostrą paprykę i szczyptę soli, wymieszaj",
+      "Na talerz wyłóż jogurt czosnkowy jako bazę",
+      "Delikatnie ułóż na jogurcie ugotowane jajka poche",
+      "Polej jajka gorącym masłem z papryką",
+      "Posyp świeżym koperkiem i podawaj z ulubionym pieczywem"
+    ],
+    "nutrition_per_serving": {
+      "calories": 273,
+      "protein_g": 17,
+      "fat_g": 22,
+      "carbs_g": 3
+    },
+    "tags": ["wysokobiałkowy", "śniadanie", "szybkie", "kuchnia turecka"],
+    "source": "instagram",
+    "notes": null
+  }
+]
