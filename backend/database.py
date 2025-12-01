@@ -5,6 +5,7 @@ DATABASE = 'recipes.db'
 def get_db_connection():
     conn = sqlite3.connect(DATABASE)
 
+    #When i set this below SQLLite returns Row object instead of plain tuples(i have to print that like object)
     conn.row_factory = sqlite3.Row
 
     conn.execute("PRAGMA foreign_keys = ON")
