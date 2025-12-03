@@ -1,15 +1,28 @@
-from flask import Flask, jsonify, abort
+from flask import Flask, jsonify, abort, request
 from database import get_db_connection
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
+
+VALID_CATEGORIES = ['breakfast', 'lunch', 'dinner', 'snack']
 
 @app.route("/api/recipes")
 def get_recipes():
     connection = get_db_connection()
     cursor = connection.cursor()
 
-    cursor.execute("SELECT * FROM recipes")
+    category = request.args.get('category')
+
+    if category and category not in VALID_CATEGORIES:
+        return jsonify({
+            "error": "Wrong category",
+            "valid_categories": VALID_CATEGORIES
+        }), 400
+    elif category:
+        cursor.execute("SELECT * FROM recipes WHERE category = ?", (category,))
+    else:
+        cursor.execute("SELECT * FROM recipes")
+
     rows = cursor.fetchall()
 
     connection.close()
