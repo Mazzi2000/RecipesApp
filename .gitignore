@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.__pyc
+
+# Database 
+backend/recipes.db
+
+# Virtual enviroments
+venv/
+.env/
+.venv
+
+# macOS
+.DS_Store
