@@ -1,11 +1,22 @@
-from flask import Flask, jsonify, abort, request
+from flask import Flask, jsonify, abort, request, send_from_directory
 from routes.recipes import recipes_bp
+import os
 
 app = Flask(__name__)
 
-app.register_blueprint(recipes_bp)
+FRONTEND_FOLDER = os.path.join(os.path.dirname(__file__), '..', 'frontend')
 
 app.config['JSON_AS_ASCII'] = False
+
+@app.route("/")
+def serve_index():
+    return send_from_directory(FRONTEND_FOLDER, 'index.html')
+
+@app.route("/path:filename")
+def serve_static(filename):
+    return send_from_directory(FRONTEND_FOLDER, filename)
+
+app.register_blueprint(recipes_bp)
 
 @app.errorhandler(404)
 def request_error(error):
@@ -22,10 +33,6 @@ def server_error(error):
         "message": "Requested resource doesnt not exist"
     }), 500
 
-
-@app.route("/")
-def hello_adam():
-    return "<p>How you doing men </p>"
 
 if __name__ == '__main__':
     app.run(debug=True)
