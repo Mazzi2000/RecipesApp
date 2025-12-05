@@ -203,6 +203,54 @@ async function renderRecipeDetail(recipe) {
     `;
 }
 
+const CATEGORIES = [
+    { value: null, label: 'Wszystkie' },
+    { value: 'breakfast', label: '🌅 Śniadanie' },
+    { value: 'lunch', label: '🍽️ Obiad' },
+    { value: 'dinner', label: '🌙 Kolacja' },
+    { value: 'snack', label: '🥨 Przekąska' }
+];
+
+let currentCategory = null;
+
+/**
+ * 
+ */
+function renderFilters() {
+    const html = CATEGORIES.map(cat => `
+        <button class="px-4 py-2 rounded transition-colors
+            ${cat.value === currentCategory
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-700 hover:bg-gray-600'}"
+            data-category="${cat.value}">${cat.label}
+        </button>
+    `).join('');
+
+    filtersEl.innerHTML = html;
+
+    filtersEl.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const category = btn.dataset.category;
+            filterByCategory(category === 'null' ? null : category);
+        });
+    });
+}
+
+async function filterByCategory(category) {
+    currentCategory = category;
+
+    renderFilters();
+
+    recipeDetailEl.innerHTML = '<p class="col-span-full text-center">Ładowanie...</p>';
+
+    try {
+        const recipes = await fetchRecipes(category);
+        renderRecipesList(recipes);
+    } catch (error) {
+        recipesListEl.innerHTML = `<p class="text-red-500 col-span-full text-center">Błąd: ${error.message}</p>`;
+    }
+}
+
 function showRecipesList(){
     recipeDetailEl.classList.add('hidden');
     recipeDetailEl.innerHTML = '';
@@ -212,13 +260,12 @@ function showRecipesList(){
 }
 
 async function init() {
+    renderFilters();
     try {
         const recipes = await fetchRecipes();
         renderRecipesList(recipes);
     } catch (error){
-        recipesListEl.innerHTML = `
-            <p class="text-red-500 col-span-full text-center py-8">Błąd ładowania: ${error.message}</p>
-        `;
+        recipesListEl.innerHTML = `<p class="text-red-500 col-span-full text-center py-8">Błąd ładowania: ${error.message}</p>`;
     }
 }
 document.addEventListener('DOMContentLoaded', init);
