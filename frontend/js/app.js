@@ -259,11 +259,19 @@ function showRecipesList(){
     filtersEl.classList.remove
 }
 
+async function getStatistics() {
+    const count = await fetch(`${API_URL}/statistics`)
+    let numberOfRecipes = await count.json()
+
+    filtersEl.innerHTML += `<span class="ml-auto text-violet-300 font-sans font-semibold">Liczba przepisów: ${numberOfRecipes}</span>`
+}
+
 async function init() {
     renderFilters();
     try {
         const recipes = await fetchRecipes();
         renderRecipesList(recipes);
+        getStatistics()
     } catch (error){
         recipesListEl.innerHTML = `<p class="text-red-500 col-span-full text-center py-8">Błąd ładowania: ${error.message}</p>`;
     }
