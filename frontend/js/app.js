@@ -234,6 +234,9 @@ function renderFilters() {
             filterByCategory(category === 'null' ? null : category);
         });
     });
+
+    getStatistics();
+
 }
 
 async function filterByCategory(category) {
@@ -253,17 +256,20 @@ async function filterByCategory(category) {
 
 function showRecipesList(){
     recipeDetailEl.classList.add('hidden');
-    recipeDetailEl.innerHTML = '';
 
     recipesListEl.classList.remove('hidden');
-    filtersEl.classList.remove
+    filtersEl.classList.remove('hidden');
 }
 
 async function getStatistics() {
     const count = await fetch(`${API_URL}/statistics`)
     let numberOfRecipes = await count.json()
 
-    filtersEl.innerHTML += `<span class="ml-auto text-violet-300 font-sans font-semibold">Liczba przepisów: ${numberOfRecipes}</span>`
+    filtersEl.insertAdjacentHTML('beforeend', `
+            <span class="ml-auto text-violet-300 font-sans font-semibold">
+                Liczba przepisów: ${numberOfRecipes}
+            </span>
+        `);
 }
 
 async function init() {
@@ -271,7 +277,6 @@ async function init() {
     try {
         const recipes = await fetchRecipes();
         renderRecipesList(recipes);
-        getStatistics()
     } catch (error){
         recipesListEl.innerHTML = `<p class="text-red-500 col-span-full text-center py-8">Błąd ładowania: ${error.message}</p>`;
     }
