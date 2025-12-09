@@ -43,12 +43,6 @@ def get_recipe(recipe_id):
         abort(404, description="The recipe doesnt exists.")
         connection.close()
 
-    '''
-    SELECT r.*, i.name as ingredient_name, i.amount, i.unit, i.notes as ingredient_notes
-    FROM recipes r
-    LEFT JOIN ingredients i ON r.id = i.recipe_id
-    WHERE r.id = ?'''
-
     ingredients = cursor.execute("SELECT * FROM ingredients WHERE recipe_id = ?", (recipe_id,)).fetchall()
     connection.close()
 

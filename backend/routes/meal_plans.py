@@ -8,7 +8,8 @@ meal_plans_bp = Blueprint('meal_plans', __name__, url_prefix="/api")
 def get_meal_plans():
     conn = get_db_connection()
 
-    date = request.args.get('date') if request.args.get('date') else datetime.today()
+    #If no date is provided, it is today's date
+    date = request.args.get('date') if request.args.get('date') else datetime.today().strftime('%Y-%m-%d')
 
     valid_date = is_valid_date(date)
     if valid_date:
@@ -48,27 +49,62 @@ def is_valid_date(date_string):
     except ValueError:
         return False
 
-# @meal_plans_bp.route('/meal-plans', methods=["POST"])
-# def add_plans():
-#     conn = get_db_connection()
-#     if request.method == 'POST':
-#         data = request.get_json()
+@meal_plans_bp.route('/meal-plans', methods=["POST"])
+def add_plans():
+    conn = get_db_connection()
+    if request.method == 'POST':
+        data = request.get_json()
 
-#         if not data:
-#             return jsonify({'error': 'No JSON data'}), 400
+        if not data:
+            return jsonify({'error': 'No JSON data'}), 400
 
-#         date = data.get('date')
-#         meal_type = data.get('meal_type')
-#         recipe_id = data.get('recipe_id')
-#         servings = data.get('servings')
+        date = data.get('date')
+        meal_type = data.get('meal_type')
+        recipe_id = data.get('recipe_id')
+        servings = data.get('servings')
 
-#         required = ['date', 'meal_type', 'recipe_id']
+        required = ['date', 'meal_type', 'recipe_id']
 
-#         for field in required:
-#             if field not in data:
-#                 return jsonify({'error': f'Missing field: {field}'}), 400
+        for field in required:
+            if field not in data:
+                return jsonify({'error': f'Missing field: {field}'}), 400
 
-#     recipe = conn.execute('''SELECT * FROM recipes WHERE id = ?''', (data['recipe_id'],)).fetchall()
+    recipe = conn.execute('''SELECT * FROM recipes WHERE id = ?''', (recipe_id,)).fetchone()
 
-#     if recipe:
-#         conn.execute('''INSERT INTO meal_plans (date, meal_type, recipe_id, servings) VALUES (?, ?, ?, ?)''', (date, meal_type, recipe_id, servings))
+    if recipe:
+        cursor = conn.execute('''INSERT INTO meal_plans (date, meal_type, recipe_id, servings) VALUES (?, ?, ?, ?)''', (date, meal_type, recipe_id, servings))
+    else:
+        return jsonify({'error': 'Recipe not found'}), 404
+
+    new_id = cursor.lastrowid
+    conn.commit()
+    conn.close()
+
+    return jsonify({
+        'id': new_id,
+        'date': date,
+        'meal_type': meal_type,
+        'recipe_id': recipe_id,
+        'servings': servings,
+        'message': 'Meal plan created successfully'
+    }), 201
+
+@meal_plans_bp.route('/meal-plans/<int:meal_id>', methods = ['DELETE'])
+def delete_meal(meal_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute('DELETE FROM meal_plans WHERE id = ?', (meal_id,))
+
+    #Checking if a meal plan existed
+    if cursor.rowcount == 0:
+        return jsonify({
+            'error': 'Meal plan not found'
+        }), 404
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({
+        'message': 'Meal plan deleted successfully'
+    })
