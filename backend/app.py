@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, abort, request, send_from_directory
 from routes.recipes import recipes_bp
 from routes.statistics import statistics_bp
+from routes.meal_plans import meal_plans_bp
 import os
 
 app = Flask(__name__)
@@ -19,6 +20,7 @@ def serve_static(filename):
 
 app.register_blueprint(recipes_bp)
 app.register_blueprint(statistics_bp)
+app.register_blueprint(meal_plans_bp)
 
 @app.errorhandler(404)
 def request_error(error):
