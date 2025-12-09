@@ -14,16 +14,27 @@
         <h1 class="text-2xl font-bold text-center">Przepisy Natalii</h1>
     </header>
     <main class="max-w-6xl mx-auto p-4">
-        <section id="filters" class="flex gap-2 mb-6 flex-wrap">
+        <nav class="mb-6 flex gap-4 bg-cyan-300 p-1 rounded-lg">
+            <button id="nav-recipes" class="text-green-200 p-3 bg-pink-900 font-semibold rounded-lg cursor-pointer">📖 Przepisy</button>
+            <button id="nav-planner" class="text-green-200 p-3 bg-pink-900 font-semibold rounded-lg cursor-pointer">📅 Meal Planner</button>
+        </nav>
 
-        </section>
+        <div id="recipes-view">
+            <section id="filters" class="flex gap-2 mb-6 flex-wrap"></section>
+            <section id="recipes-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></section>
+        </div>
 
-        <section id="recipes-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div id="planner-view" class="hidden">
+            <div id="date-picker" class="flex items-center justify-center gap-4 mb-6">
+                <button id="prev-day">-</button>
+                <span id="current-date">2025-12-09</span>
+                <button id="next-day">+</button>
+            </div>
+            <div id="meal-plan"></div>
+            <div id="daily-totals"></div>
+        </div>
 
-        </section>
-        <section id="recipe-detail" class="hidden">
-
-        </section>
+        <section id="recipe-detail" class="hidden"></section>
     </main>
     <script src="js/app.js"></script>
 </body>

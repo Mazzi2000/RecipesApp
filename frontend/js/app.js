@@ -272,8 +272,90 @@ async function getStatistics() {
         `);
 }
 
+function showRecipesView() {
+    document.getElementById('recipes-view').classList.remove('hidden');
+    document.getElementById('planner-view').classList.add('hidden');
+}
+
+function showPlannerView() {
+    document.getElementById('planner-view').classList.remove('hidden');
+    document.getElementById('recipes-view').classList.add('hidden');
+    loadMealPlan()
+}
+
+let currentDate = new Date();
+
+function formatDate(date) {
+    //"YYYY-MM-DD" Retrive format
+    return date.toISOString().split('T')[0];
+}
+
+function changeDate(days) {
+    currentDate.setDate(currentDate.getDate() + days);
+    document.getElementById('current-date').textContent = formatDate(currentDate);
+    loadMealPlan();
+}
+
+async function loadMealPlan() {
+    const date = formatDate(currentDate);
+    const response = await fetch(`/api/meal-plans?date=${date}`);
+    const plan = await response.json();
+    renderMealPlan(plan);
+}
+
+function renderMealPlan(plan) {
+    const mealTypes = [
+        { key: 'breakfast', label: '🌅 Śniadanie' },
+        { key: 'lunch', label: '🍽️ Obiad' },
+        { key: 'dinner', label: '🌙 Kolacja' },
+        { key: 'snack', label: '🥨 Przekąska' }
+    ];
+    const html = mealTypes.map(type => {
+        const meals = plan.filter(m => m.meal_type === type.key);
+
+        return `
+            <div class="bg-gray-800 rounded-lg p-4 mb-4">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="font-semibold">${type.label}</h3>
+                    <button class="" data-meal-type="${type.key}">
+                        +Dodaj
+                    </button>
+                </div>
+                <div class="">
+                    ${meals.length > 0
+                        ? meals.map(m=> renderMealItem(m)).join('')
+                        : '<p class="text-gray-500 text-sm">Brak posiłków</p>'
+                    }
+                </div>
+            </div>
+            `;
+    }).join('');
+
+    document.getElementById('meal-plan').innerHTML = html;
+
+}
+
+
+
+
+
+function renderMealItem(meal) {
+    return `
+        <div class="flex justify-between items-center py-2 border-b border-gray-700">
+            <div>
+                <span>${meal.recipe_name}</span>
+                <span class="text-gray-400 text-sm ml-2">(${meal.calories} kcal)</span>
+            </div>
+            <button class="text-red-400 hover:text-red-300">🗑️</button>
+        </div>
+    `
+}
+
+
 async function init() {
     renderFilters();
+    document.getElementById("nav-planner").addEventListener('click', showPlannerView);
+    document.getElementById("nav-recipes").addEventListener('click', showRecipesView);
     try {
         const recipes = await fetchRecipes();
         renderRecipesList(recipes);
@@ -281,4 +363,6 @@ async function init() {
         recipesListEl.innerHTML = `<p class="text-red-500 col-span-full text-center py-8">Błąd ładowania: ${error.message}</p>`;
     }
 }
+
 document.addEventListener('DOMContentLoaded', init);
+
