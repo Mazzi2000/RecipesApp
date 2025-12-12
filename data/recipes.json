@@ -1,6 +1,1047 @@
 [
   {
     "id": null,
+    "name": "Butter Chicken (Murgh Makhani)",
+    "category": "dinner",
+    "prep_time_minutes": 45,
+    "servings": 4,
+    "ingredients": [
+      {
+        "name": "pierś z kurczaka",
+        "amount": 600,
+        "unit": "g",
+        "notes": "pokrojona w kostkę"
+      },
+      {
+        "name": "jogurt naturalny",
+        "amount": 200,
+        "unit": "g",
+        "notes": null
+      },
+      {
+        "name": "masło",
+        "amount": 100,
+        "unit": "g",
+        "notes": null
+      },
+      {
+        "name": "śmietanka 30%",
+        "amount": 200,
+        "unit": "ml",
+        "notes": null
+      },
+      {
+        "name": "pomidory przecier",
+        "amount": 400,
+        "unit": "g",
+        "notes": "puszka"
+      },
+      {
+        "name": "cebula",
+        "amount": 2,
+        "unit": "szt",
+        "notes": "duże, posiekane"
+      },
+      {
+        "name": "czosnek",
+        "amount": 4,
+        "unit": "szt",
+        "notes": "ząbki"
+      },
+      {
+        "name": "imbir",
+        "amount": 2,
+        "unit": "łyżka",
+        "notes": "starty"
+      },
+      {
+        "name": "garam masala",
+        "amount": 2,
+        "unit": "łyżka",
+        "notes": null
+      },
+      {
+        "name": "kurkuma",
+        "amount": 1,
+        "unit": "łyżeczka",
+        "notes": null
+      },
+      {
+        "name": "chili w proszku",
+        "amount": 1,
+        "unit": "łyżeczka",
+        "notes": null
+      },
+      {
+        "name": "sól",
+        "amount": 0,
+        "unit": "do_smaku",
+        "notes": null
+      },
+      {
+        "name": "kolendra",
+        "amount": 0,
+        "unit": "do_smaku",
+        "notes": "świeża"
+      }
+    ],
+    "instructions": [
+      "Zamarynuj kurczaka w jogurcie z połową garam masala, kurkumą i solą na 30 minut",
+      "Rozgrzej masło na patelni i podsmaż zamarynowanego kurczaka do zarumienienia, odstaw",
+      "Na tej samej patelni podsmaż posiekaną cebulę do miękkości",
+      "Dodaj czosnek, imbir i pozostałe przyprawy, smaż 2 minuty",
+      "Wlej przecier pomidorowy, gotuj 10 minut",
+      "Zmiksuj sos na gładką masę (opcjonalnie)",
+      "Dodaj kurczaka i śmietankę, gotuj na małym ogniu 15 minut",
+      "Dopraw solą do smaku, posyp kolendrą i podawaj z ryżem basmati"
+    ],
+    "nutrition_per_serving": {
+      "calories": 542,
+      "protein_g": 42,
+      "fat_g": 38,
+      "carbs_g": 12
+    },
+    "tags": [
+      "wysokobiałkowy",
+      "kuchnia indyjska",
+      "obiad"
+    ],
+    "source": "własny",
+    "notes": null
+  },
+  {
+    "id": null,
+    "name": "Wołowina po seczuańsku z ryżem",
+    "category": "lunch",
+    "prep_time_minutes": 30,
+    "servings": 2,
+    "ingredients": [
+      {
+        "name": "wołowina",
+        "amount": 300,
+        "unit": "g",
+        "notes": "rostbef, cienkie paski"
+      },
+      {
+        "name": "ryż jaśminowy",
+        "amount": 150,
+        "unit": "g",
+        "notes": "suchy"
+      },
+      {
+        "name": "papryka czerwona",
+        "amount": 1,
+        "unit": "szt",
+        "notes": "pokrojona w paski"
+      },
+      {
+        "name": "cebula",
+        "amount": 1,
+        "unit": "szt",
+        "notes": "w piórka"
+      },
+      {
+        "name": "czosnek",
+        "amount": 3,
+        "unit": "szt",
+        "notes": "ząbki"
+      },
+      {
+        "name": "imbir",
+        "amount": 1,
+        "unit": "łyżka",
+        "notes": "starty"
+      },
+      {
+        "name": "sos sojowy",
+        "amount": 3,
+        "unit": "łyżka",
+        "notes": null
+      },
+      {
+        "name": "sos ostrygowy",
+        "amount": 2,
+        "unit": "łyżka",
+        "notes": null
+      },
+      {
+        "name": "ocet ryżowy",
+        "amount": 1,
+        "unit": "łyżka",
+        "notes": null
+      },
+      {
+        "name": "miód",
+        "amount": 1,
+        "unit": "łyżka",
+        "notes": null
+      },
+      {
+        "name": "olej sezamowy",
+        "amount": 1,
+        "unit": "łyżka",
+        "notes": null
+      },
+      {
+        "name": "chili",
+        "amount": 2,
+        "unit": "szt",
+        "notes": "suszone"
+      },
+      {
+        "name": "skrobia ziemniaczana",
+        "amount": 1,
+        "unit": "łyżka",
+        "notes": null
+      }
+    ],
+    "instructions": [
+      "Ugotuj ryż zgodnie z instrukcją na opakowaniu",
+      "Zamarynuj paski wołowiny w sosie sojowym i skrobi na 15 minut",
+      "Rozgrzej olej sezamowy na wysokim ogniu w woku",
+      "Podsmaż wołowinę partiami po 2-3 minuty, odstaw",
+      "Na tym samym woku podsmaż czosnek, imbir i chili przez 30 sekund",
+      "Dodaj paprykę i cebulę, smaż 3 minuty",
+      "Wróć wołowinę do woka, dodaj sos ostrygowy, ocet i miód",
+      "Smaż intensywnie mieszając przez 2 minuty",
+      "Podawaj na gorącym ryżu"
+    ],
+    "nutrition_per_serving": {
+      "calories": 658,
+      "protein_g": 44,
+      "fat_g": 18,
+      "carbs_g": 78
+    },
+    "tags": [
+      "wysokobiałkowy",
+      "kuchnia azjatycka",
+      "ostre"
+    ],
+    "source": "własny",
+    "notes": null
+  },
+  {
+    "id": null,
+    "name": "Kotlet schabowy z ziemniakami i mizerią",
+    "category": "lunch",
+    "prep_time_minutes": 40,
+    "servings": 2,
+    "ingredients": [
+      {
+        "name": "schab",
+        "amount": 400,
+        "unit": "g",
+        "notes": "2 kotlety, rozbite"
+      },
+      {
+        "name": "jajka",
+        "amount": 2,
+        "unit": "szt",
+        "notes": null
+      },
+      {
+        "name": "mąka pszenna",
+        "amount": 4,
+        "unit": "łyżka",
+        "notes": null
+      },
+      {
+        "name": "bułka tarta",
+        "amount": 100,
+        "unit": "g",
+        "notes": null
+      },
+      {
+        "name": "olej",
+        "amount": 100,
+        "unit": "ml",
+        "notes": "do smażenia"
+      },
+      {
+        "name": "ziemniaki",
+        "amount": 500,
+        "unit": "g",
+        "notes": null
+      },
+      {
+        "name": "ogórek",
+        "amount": 300,
+        "unit": "g",
+        "notes": "do mizerii"
+      },
+      {
+        "name": "śmietana 18%",
+        "amount": 100,
+        "unit": "ml",
+        "notes": null
+      },
+      {
+        "name": "koperek",
+        "amount": 2,
+        "unit": "łyżka",
+        "notes": "posiekany"
+      },
+      {
+        "name": "sól",
+        "amount": 0,
+        "unit": "do_smaku",
+        "notes": null
+      },
+      {
+        "name": "pieprz",
+        "amount": 0,
+        "unit": "do_smaku",
+        "notes": null
+      },
+      {
+        "name": "cukier",
+        "amount": 0.5,
+        "unit": "łyżeczka",
+        "notes": "do mizerii"
+      }
+    ],
+    "instructions": [
+      "Obierz i ugotuj ziemniaki w osolonej wodzie",
+      "Rozbij kotlety tłuczkiem, dopraw solą i pieprzem",
+      "Przygotuj panierowanie: mąka, rozbite jajko, bułka tarta",
+      "Panieruj kotlety: mąka → jajko → bułka tarta",
+      "Rozgrzej olej na patelni i smaż kotlety po 5-6 minut z każdej strony na złoty kolor",
+      "Pokrój ogórka w cienkie plasterki, posól, dodaj cukier",
+      "Po 10 minutach odciśnij sok z ogórków",
+      "Wymieszaj ogórki ze śmietaną i koperkiem",
+      "Podawaj kotlety z ziemniakami i mizerią"
+    ],
+    "nutrition_per_serving": {
+      "calories": 892,
+      "protein_g": 52,
+      "fat_g": 38,
+      "carbs_g": 82
+    },
+    "tags": [
+      "tradycyjne",
+      "kuchnia polska",
+      "obiad"
+    ],
+    "source": "własny",
+    "notes": null
+  },
+  {
+    "id": null,
+    "name": "Spaghetti Carbonara",
+    "category": "dinner",
+    "prep_time_minutes": 20,
+    "servings": 2,
+    "ingredients": [
+      {
+        "name": "spaghetti",
+        "amount": 200,
+        "unit": "g",
+        "notes": null
+      },
+      {
+        "name": "boczek wędzony",
+        "amount": 150,
+        "unit": "g",
+        "notes": "pokrojony w kosteczkę"
+      },
+      {
+        "name": "jajka",
+        "amount": 3,
+        "unit": "szt",
+        "notes": "całe"
+      },
+      {
+        "name": "żółtka",
+        "amount": 1,
+        "unit": "szt",
+        "notes": null
+      },
+      {
+        "name": "parmezan",
+        "amount": 80,
+        "unit": "g",
+        "notes": "tarty"
+      },
+      {
+        "name": "czosnek",
+        "amount": 2,
+        "unit": "szt",
+        "notes": "ząbki"
+      },
+      {
+        "name": "pieprz czarny",
+        "amount": 0,
+        "unit": "do_smaku",
+        "notes": "świeżo mielony"
+      },
+      {
+        "name": "sól",
+        "amount": 0,
+        "unit": "do_smaku",
+        "notes": null
+      }
+    ],
+    "instructions": [
+      "Ugotuj makaron al dente w osolonej wodzie, zarezerwuj szklankę wody po gotowaniu",
+      "Na suchej patelni zeszklij boczek do chrupkości, dodaj zmiażdżony czosnek na koniec",
+      "W misce wymieszaj jajka, żółtko i większość parmezanu",
+      "Odcedź makaron i dodaj do patelni z boczkiem (zdejmij z ognia)",
+      "Wlej mieszankę jajeczną, szybko mieszając (ciepło makaronu ugotuje jajka)",
+      "Dodawaj wodę po makaronie aby uzyskać kremowy sos",
+      "Dopraw szczodrze świeżo mielonym pieprzem",
+      "Podawaj natychmiast posypane pozostałym parmezanem"
+    ],
+    "nutrition_per_serving": {
+      "calories": 748,
+      "protein_g": 42,
+      "fat_g": 32,
+      "carbs_g": 68
+    },
+    "tags": [
+      "wysokobiałkowy",
+      "kuchnia włoska",
+      "szybkie"
+    ],
+    "source": "własny",
+    "notes": null
+  },
+  {
+    "id": null,
+    "name": "Chili con Carne",
+    "category": "lunch",
+    "prep_time_minutes": 60,
+    "servings": 4,
+    "ingredients": [
+      {
+        "name": "wołowina mielona",
+        "amount": 500,
+        "unit": "g",
+        "notes": null
+      },
+      {
+        "name": "fasola czerwona",
+        "amount": 400,
+        "unit": "g",
+        "notes": "puszka, odcedzona"
+      },
+      {
+        "name": "pomidory krojone",
+        "amount": 400,
+        "unit": "g",
+        "notes": "puszka"
+      },
+      {
+        "name": "koncentrat pomidorowy",
+        "amount": 2,
+        "unit": "łyżka",
+        "notes": null
+      },
+      {
+        "name": "cebula",
+        "amount": 2,
+        "unit": "szt",
+        "notes": "duże"
+      },
+      {
+        "name": "papryka czerwona",
+        "amount": 2,
+        "unit": "szt",
+        "notes": null
+      },
+      {
+        "name": "czosnek",
+        "amount": 4,
+        "unit": "szt",
+        "notes": "ząbki"
+      },
+      {
+        "name": "chili w proszku",
+        "amount": 2,
+        "unit": "łyżka",
+        "notes": null
+      },
+      {
+        "name": "kminek",
+        "amount": 1,
+        "unit": "łyżeczka",
+        "notes": null
+      },
+      {
+        "name": "papryka słodka",
+        "amount": 1,
+        "unit": "łyżka",
+        "notes": null
+      },
+      {
+        "name": "bulion wołowy",
+        "amount": 300,
+        "unit": "ml",
+        "notes": null
+      },
+      {
+        "name": "olej",
+        "amount": 2,
+        "unit": "łyżka",
+        "notes": null
+      },
+      {
+        "name": "sól",
+        "amount": 0,
+        "unit": "do_smaku",
+        "notes": null
+      },
+      {
+        "name": "pieprz",
+        "amount": 0,
+        "unit": "do_smaku",
+        "notes": null
+      }
+    ],
+    "instructions": [
+      "Rozgrzej olej na dużym garnku, podsmaż posiekaną cebulę do miękkości",
+      "Dodaj czosnek i paprykę pokrojoną w kostkę, smaż 3 minuty",
+      "Dodaj mięso mielone, smaż rozgniatając do zarumienienia",
+      "Dodaj wszystkie przyprawy (chili, kminek, paprykę słodką), smaż minutę",
+      "Wlej pomidory, koncentrat i bulion, wymieszaj",
+      "Doprowadź do wrzenia, zmniejsz ogień i duś pod przykryciem 30 minut",
+      "Dodaj odcedzoną fasolę, gotuj kolejne 15 minut",
+      "Dopraw solą i pieprzem, podawaj z ryżem lub chipsami tortilla"
+    ],
+    "nutrition_per_serving": {
+      "calories": 382,
+      "protein_g": 35,
+      "fat_g": 16,
+      "carbs_g": 26
+    },
+    "tags": [
+      "wysokobiałkowy",
+      "kuchnia meksykańska",
+      "jednogarnkowe"
+    ],
+    "source": "własny",
+    "notes": null
+  },
+  {
+    "id": null,
+    "name": "Łosoś teriyaki z warzywami",
+    "category": "dinner",
+    "prep_time_minutes": 25,
+    "servings": 2,
+    "ingredients": [
+      {
+        "name": "filet z łososia",
+        "amount": 300,
+        "unit": "g",
+        "notes": "bez skóry"
+      },
+      {
+        "name": "sos sojowy",
+        "amount": 4,
+        "unit": "łyżka",
+        "notes": null
+      },
+      {
+        "name": "miód",
+        "amount": 2,
+        "unit": "łyżka",
+        "notes": null
+      },
+      {
+        "name": "sake lub wino ryżowe",
+        "amount": 2,
+        "unit": "łyżka",
+        "notes": null
+      },
+      {
+        "name": "imbir",
+        "amount": 1,
+        "unit": "łyżka",
+        "notes": "starty"
+      },
+      {
+        "name": "czosnek",
+        "amount": 2,
+        "unit": "szt",
+        "notes": "ząbki"
+      },
+      {
+        "name": "brokuł",
+        "amount": 200,
+        "unit": "g",
+        "notes": "różyczki"
+      },
+      {
+        "name": "marchew",
+        "amount": 150,
+        "unit": "g",
+        "notes": "w plastry"
+      },
+      {
+        "name": "papryka żółta",
+        "amount": 1,
+        "unit": "szt",
+        "notes": null
+      },
+      {
+        "name": "olej sezamowy",
+        "amount": 1,
+        "unit": "łyżka",
+        "notes": null
+      },
+      {
+        "name": "sezam",
+        "amount": 1,
+        "unit": "łyżka",
+        "notes": "do posypania"
+      }
+    ],
+    "instructions": [
+      "Wymieszaj sos sojowy, miód, sake, imbir i czosnek - to sos teriyaki",
+      "Zamarynuj łososia w połowie sosu na 15 minut",
+      "Rozgrzej olej sezamowy na patelni i podsmaż warzywa na wysokim ogniu 5 minut",
+      "Przełóż warzywa do miski, na tej samej patelni usmaż łososia po 3-4 minuty z każdej strony",
+      "Pod koniec smażenia polej łososia pozostałym sosem teriyaki",
+      "Podawaj łososia z warzywami, posyp sezamem",
+      "Opcjonalnie podaj z ryżem lub makaronem soba"
+    ],
+    "nutrition_per_serving": {
+      "calories": 428,
+      "protein_g": 38,
+      "fat_g": 18,
+      "carbs_g": 28
+    },
+    "tags": [
+      "wysokobiałkowy",
+      "zdrowe tłuszcze",
+      "kuchnia japońska"
+    ],
+    "source": "własny",
+    "notes": null
+  },
+  {
+    "id": null,
+    "name": "Shakshuka",
+    "category": "breakfast",
+    "prep_time_minutes": 30,
+    "servings": 2,
+    "ingredients": [
+      {
+        "name": "jajka",
+        "amount": 4,
+        "unit": "szt",
+        "notes": null
+      },
+      {
+        "name": "pomidory krojone",
+        "amount": 400,
+        "unit": "g",
+        "notes": "puszka"
+      },
+      {
+        "name": "papryka czerwona",
+        "amount": 1,
+        "unit": "szt",
+        "notes": "duża"
+      },
+      {
+        "name": "cebula",
+        "amount": 1,
+        "unit": "szt",
+        "notes": null
+      },
+      {
+        "name": "czosnek",
+        "amount": 3,
+        "unit": "szt",
+        "notes": "ząbki"
+      },
+      {
+        "name": "koncentrat pomidorowy",
+        "amount": 1,
+        "unit": "łyżka",
+        "notes": null
+      },
+      {
+        "name": "kminek",
+        "amount": 1,
+        "unit": "łyżeczka",
+        "notes": null
+      },
+      {
+        "name": "papryka słodka",
+        "amount": 1,
+        "unit": "łyżeczka",
+        "notes": null
+      },
+      {
+        "name": "chili w płatkach",
+        "amount": 0.5,
+        "unit": "łyżeczka",
+        "notes": null
+      },
+      {
+        "name": "oliwa z oliwek",
+        "amount": 2,
+        "unit": "łyżka",
+        "notes": null
+      },
+      {
+        "name": "feta",
+        "amount": 50,
+        "unit": "g",
+        "notes": "pokruszona"
+      },
+      {
+        "name": "pietruszka",
+        "amount": 0,
+        "unit": "do_smaku",
+        "notes": "świeża"
+      },
+      {
+        "name": "sól",
+        "amount": 0,
+        "unit": "do_smaku",
+        "notes": null
+      }
+    ],
+    "instructions": [
+      "Rozgrzej oliwę na głębokiej patelni, podsmaż posiekaną cebulę do miękkości",
+      "Dodaj pokrojoną w paski paprykę i czosnek, smaż 3 minuty",
+      "Dodaj koncentrat pomidorowy i przyprawy, smaż minutę",
+      "Wlej pomidory z puszki, gotuj na średnim ogniu 10 minut do zagęszczenia",
+      "Dopraw sosem solą, zrób 4 wgłębienia w sosie",
+      "Wbij jajka do wgłębień, przykryj i gotuj 6-8 minut do ścięcia białek",
+      "Posyp pokruszoną fetą i pietruszką",
+      "Podawaj gorące z pieczywem do maczania"
+    ],
+    "nutrition_per_serving": {
+      "calories": 368,
+      "protein_g": 20,
+      "fat_g": 24,
+      "carbs_g": 18
+    },
+    "tags": [
+      "wysokobiałkowy",
+      "śniadanie",
+      "kuchnia bliskowschodnia",
+      "wegetariańskie"
+    ],
+    "source": "własny",
+    "notes": null
+  },
+  {
+    "id": null,
+    "name": "Pad Thai z krewetkami",
+    "category": "dinner",
+    "prep_time_minutes": 30,
+    "servings": 2,
+    "ingredients": [
+      {
+        "name": "makaron ryżowy",
+        "amount": 200,
+        "unit": "g",
+        "notes": "płaski"
+      },
+      {
+        "name": "krewetki",
+        "amount": 250,
+        "unit": "g",
+        "notes": "obrane"
+      },
+      {
+        "name": "jajka",
+        "amount": 2,
+        "unit": "szt",
+        "notes": null
+      },
+      {
+        "name": "kiełki fasoli mung",
+        "amount": 100,
+        "unit": "g",
+        "notes": null
+      },
+      {
+        "name": "szczypiorek chiński",
+        "amount": 50,
+        "unit": "g",
+        "notes": "cięty 3cm"
+      },
+      {
+        "name": "orzeszki ziemne",
+        "amount": 50,
+        "unit": "g",
+        "notes": "prażone, posiekane"
+      },
+      {
+        "name": "sos rybny",
+        "amount": 3,
+        "unit": "łyżka",
+        "notes": null
+      },
+      {
+        "name": "pasta z tamaryndowca",
+        "amount": 2,
+        "unit": "łyżka",
+        "notes": null
+      },
+      {
+        "name": "cukier palmowy",
+        "amount": 2,
+        "unit": "łyżka",
+        "notes": null
+      },
+      {
+        "name": "czosnek",
+        "amount": 3,
+        "unit": "szt",
+        "notes": "ząbki"
+      },
+      {
+        "name": "limonka",
+        "amount": 1,
+        "unit": "szt",
+        "notes": "do podania"
+      },
+      {
+        "name": "olej",
+        "amount": 3,
+        "unit": "łyżka",
+        "notes": null
+      },
+      {
+        "name": "chili",
+        "amount": 0,
+        "unit": "do_smaku",
+        "notes": "suszone płatki"
+      }
+    ],
+    "instructions": [
+      "Namocz makaron ryżowy w ciepłej wodzie na 30 minut, odcedź",
+      "Wymieszaj sos rybny, pastę tamaryndowca i cukier palmowy",
+      "Rozgrzej olej na woku, podsmaż czosnek i krewetki 2-3 minuty",
+      "Przesuń krewetki na bok, wbij jajka i szybko zamieszaj",
+      "Dodaj makaron i sos, smaż intensywnie mieszając 3 minuty",
+      "Dodaj kiełki i szczypiorek, smaż minutę",
+      "Podawaj posypane orzeszkami, z ćwiartkami limonki i chili"
+    ],
+    "nutrition_per_serving": {
+      "calories": 612,
+      "protein_g": 36,
+      "fat_g": 22,
+      "carbs_g": 68
+    },
+    "tags": [
+      "wysokobiałkowy",
+      "kuchnia tajska",
+      "owoce morza"
+    ],
+    "source": "własny",
+    "notes": null
+  },
+  {
+    "id": null,
+    "name": "Gulasz wołowy po węgiersku",
+    "category": "lunch",
+    "prep_time_minutes": 120,
+    "servings": 4,
+    "ingredients": [
+      {
+        "name": "wołowina",
+        "amount": 800,
+        "unit": "g",
+        "notes": "mostek lub antrykot, kostka"
+      },
+      {
+        "name": "cebula",
+        "amount": 3,
+        "unit": "szt",
+        "notes": "duże"
+      },
+      {
+        "name": "papryka czerwona",
+        "amount": 2,
+        "unit": "szt",
+        "notes": null
+      },
+      {
+        "name": "pomidory",
+        "amount": 3,
+        "unit": "szt",
+        "notes": "pokrojone"
+      },
+      {
+        "name": "papryka węgierska ostra",
+        "amount": 3,
+        "unit": "łyżka",
+        "notes": null
+      },
+      {
+        "name": "kminek",
+        "amount": 1,
+        "unit": "łyżeczka",
+        "notes": null
+      },
+      {
+        "name": "majeranek",
+        "amount": 1,
+        "unit": "łyżeczka",
+        "notes": null
+      },
+      {
+        "name": "czosnek",
+        "amount": 4,
+        "unit": "szt",
+        "notes": "ząbki"
+      },
+      {
+        "name": "bulion wołowy",
+        "amount": 500,
+        "unit": "ml",
+        "notes": null
+      },
+      {
+        "name": "smalec",
+        "amount": 3,
+        "unit": "łyżka",
+        "notes": null
+      },
+      {
+        "name": "ziemniaki",
+        "amount": 600,
+        "unit": "g",
+        "notes": "opcjonalnie"
+      },
+      {
+        "name": "sól",
+        "amount": 0,
+        "unit": "do_smaku",
+        "notes": null
+      },
+      {
+        "name": "pieprz",
+        "amount": 0,
+        "unit": "do_smaku",
+        "notes": null
+      }
+    ],
+    "instructions": [
+      "Rozgrzej smalec w garnku żeliwnym, podsmaż kostki wołowiny partiami do zarumienienia",
+      "Odłóż mięso, na tym samym tłuszczu zeszklij posiekaną cebulę",
+      "Dodaj czosnek, paprykę węgierską, kminek i majeranek, smaż minutę",
+      "Wróć mięso do garnka, dodaj paprykę pokrojoną w paski i pomidory",
+      "Zalej bulionem, doprowadź do wrzenia",
+      "Zmniejsz ogień, przykryj i duś 1,5-2 godziny do miękkości mięsa",
+      "Opcjonalnie dodaj ziemniaki pokrojone w większe kawałki 30 minut przed końcem",
+      "Dopraw solą i pieprzem, podawaj z kluskami lub chlebem"
+    ],
+    "nutrition_per_serving": {
+      "calories": 468,
+      "protein_g": 48,
+      "fat_g": 22,
+      "carbs_g": 18
+    },
+    "tags": [
+      "wysokobiałkowy",
+      "jednogarnkowe",
+      "kuchnia węgierska"
+    ],
+    "source": "własny",
+    "notes": null
+  },
+  {
+    "id": null,
+    "name": "Pierś kurczaka w sosie miodowo-musztardowym",
+    "category": "dinner",
+    "prep_time_minutes": 25,
+    "servings": 2,
+    "ingredients": [
+      {
+        "name": "pierś z kurczaka",
+        "amount": 400,
+        "unit": "g",
+        "notes": "2 filety"
+      },
+      {
+        "name": "miód",
+        "amount": 2,
+        "unit": "łyżka",
+        "notes": null
+      },
+      {
+        "name": "musztarda dijon",
+        "amount": 2,
+        "unit": "łyżka",
+        "notes": null
+      },
+      {
+        "name": "czosnek",
+        "amount": 2,
+        "unit": "szt",
+        "notes": "ząbki"
+      },
+      {
+        "name": "śmietanka 30%",
+        "amount": 150,
+        "unit": "ml",
+        "notes": null
+      },
+      {
+        "name": "masło",
+        "amount": 2,
+        "unit": "łyżka",
+        "notes": null
+      },
+      {
+        "name": "tymianek",
+        "amount": 1,
+        "unit": "łyżeczka",
+        "notes": "suszone"
+      },
+      {
+        "name": "sól",
+        "amount": 0,
+        "unit": "do_smaku",
+        "notes": null
+      },
+      {
+        "name": "pieprz",
+        "amount": 0,
+        "unit": "do_smaku",
+        "notes": null
+      },
+      {
+        "name": "szpinak baby",
+        "amount": 100,
+        "unit": "g",
+        "notes": "do podania"
+      }
+    ],
+    "instructions": [
+      "Dopraw piersi kurczaka solą i pieprzem",
+      "Rozgrzej masło na patelni, usmaż kurczaka po 5-6 minut z każdej strony do zarumienienia",
+      "Przełóż kurczaka do naczynia i przykryj folią",
+      "Na tej samej patelni podsmaż czosnek przez 30 sekund",
+      "Dodaj miód, musztardę i tymianek, wymieszaj",
+      "Wlej śmietankę, gotuj na małym ogniu 3 minuty do zagęszczenia",
+      "Wróć kurczaka do sosu, podgrzej minutę",
+      "Podawaj z surowym szpinakiem baby lub ugotowanymi warzywami"
+    ],
+    "nutrition_per_serving": {
+      "calories": 512,
+      "protein_g": 46,
+      "fat_g": 28,
+      "carbs_g": 18
+    },
+    "tags": [
+      "wysokobiałkowy",
+      "szybkie",
+      "kremowe"
+    ],
+    "source": "własny",
+    "notes": null
+  },
+  {
+    "id": null,
     "name": "Pasta z tuńczykiem i awokado",
     "category": "snack",
     "prep_time_minutes": 15,
@@ -38,7 +1079,7 @@
   },
   {
     "id": null,
-    "name": "Jajka po turecku (Çılbır)",
+    "name": "Jajka po turecku",
     "category": "breakfast",
     "prep_time_minutes": 15,
     "servings": 1,

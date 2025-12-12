@@ -317,7 +317,7 @@ function renderMealPlan(plan) {
             <div class="bg-gray-800 rounded-lg p-4 mb-4">
                 <div class="flex justify-between items-center mb-2">
                     <h3 class="font-semibold">${type.label}</h3>
-                    <button class="" data-meal-type="${type.key}">
+                    <button onclick="addMealPrompt('${type.key}')" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer" data-meal-type="${type.key}">
                         +Dodaj
                     </button>
                 </div>
@@ -333,10 +333,39 @@ function renderMealPlan(plan) {
 
     document.getElementById('meal-plan').innerHTML = html;
 
+    let totals = plan[plan.length - 1];
+    renderDailyTotals(totals);
+
 }
 
+function addMealPrompt(mealType) {
+    const recipeId = prompt('Podaj ID przepisu:');
+    if (recipeId) {
+        addMealToPlan(mealType, parseInt(recipeId));
+    }
+}
 
+async function addMealToPlan(mealType, recipeId, servings = 1) {
+    const response = await fetch('/api/meal-plans', {
+        method: 'POST',
+        headers: {
+            'Content-type': 'application/json'
+        },
+        body: JSON.stringify({
+            date: formatDate(currentDate),
+            meal_type: mealType,
+            recipe_id: recipeId,
+            servings: servings
+        })
+    });
 
+    if (response.ok) {
+        loadMealPlan();
+    } else {
+        const error = await response.json();
+        alert(error.message || 'Błąd dodawania');
+    }
+}
 
 
 function renderMealItem(meal) {
@@ -344,11 +373,38 @@ function renderMealItem(meal) {
         <div class="flex justify-between items-center py-2 border-b border-gray-700">
             <div>
                 <span>${meal.recipe_name}</span>
-                <span class="text-gray-400 text-sm ml-2">(${meal.calories} kcal)</span>
+                <span class="text-gray-400 text-sm ml-2">(${meal.calories_per_serving} kcal)</span>
             </div>
             <button class="text-red-400 hover:text-red-300">🗑️</button>
         </div>
     `
+}
+
+async function removeMeal(mealId) {
+    if(!confirm('Usunąć posiłek z planu?')) return;
+
+    const response = await fetch(`/api/meal-plans/${mealId}`, {
+        method: 'DELETE'
+    });
+
+    if (response.ok) {
+        loadMealPlan();
+    }
+}
+
+function renderDailyTotals(totals) {
+    document.getElementById('daily-totals').innerHTML = `
+        <div class="bg-gray-800 rounded-lg p-4 mt-6">
+            <h3 class="font-semibold mb-3">📊 Podsumowanie dnia</h3>
+            <div class="grid grid-cols-4 gap-4 text=center">
+                <div>
+                    <div class="text-2xl">🔥</div>
+                    <div class="font-bold">${totals.calories}</div>
+                    <div class="text-xs text-gray-400">kcal</div>
+                </div>
+            </div>
+        </div>   
+    `;
 }
 
 
