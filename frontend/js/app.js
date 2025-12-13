@@ -1,52 +1,32 @@
-const API_URL = '/api';
+import {
+    fetchRecipes,
+    fetchRecipe,
+    addMealToPlan,
+    removeMeal,
+    getStatistics,
+    fetchMealPlan
+} from './api.js';
 
-/** Fetch all recipes (optional category filter)
- * @param {string|null} /category
- * @returns {Promise<Array>}
- */
-async function fetchRecipes(category=null){
-    let url = `${API_URL}/recipes`;
-    if(category){
-        url += `?category=${category}`
-    }
+//Configuration
+const CATEGORIES = [
+    { value: null, label: 'Wszystkie' },
+    { value: 'breakfast', label: '🌅 Śniadanie' },
+    { value: 'lunch', label: '🍽️ Obiad' },
+    { value: 'dinner', label: '🌙 Kolacja' },
+    { value: 'snack', label: '🥨 Przekąska' }
+];
 
-    const response = await fetch(url);
+// State
+let currentDate = new Date();
+let currentCategory = null;
 
-    if (!response.ok){
-        throw new Error(`HTTP error! status ${response.status}`);
-    }
-
-    const data = await response.json()
-
-    return data
-}
-
-/** Fetch one recipe with ingredients
- * @param {number} recipeId
- * @returns {Promise<Object>}
- */
-async function fetchRecipe(recipeId){
-    let url = `${API_URL}/recipes/${recipeId}`
-
-    const response = await fetch(url);
-
-    if (!response.ok){
-        throw new Error(`Http error! status ${response.status}`);
-    }
-
-    const data = await response.json();
-    
-    return data;
-}
-
+// DOM REFERENCES
 const recipesListEl = document.getElementById('recipes-list');
 const recipeDetailEl = document.getElementById('recipe-detail');
 const filtersEl = document.getElementById('filters');
 
-/**
- * @param {Object} recipe 
- * @returns {string} HTML
- */
+// RENDER FUNCTIONS
+
 function createRecipeCard(recipe) {
     const categoryLabels = {
         'breakfast': 'Śniadanie',
@@ -74,7 +54,7 @@ function createRecipeCard(recipe) {
 }
 
 /**
- * @param {Array} recipes 
+ * @param {Array} recipes
  */
 function renderRecipesList(recipes) {
     if (recipes.length === 0) {
@@ -91,46 +71,6 @@ function renderRecipesList(recipes) {
     recipesListEl.innerHTML = html;
 
     addRecipeCardListeners();
-
-}
-
-/**
- * 
- */
-function addRecipeCardListeners(){
-    const cards = recipesListEl.querySelectorAll('[data-recipe-id]');
-
-    cards.forEach(card => {
-        card.addEventListener('click', () =>{
-            const recipeId = card.dataset.recipeId
-            showRecipeDetail(recipeId);
-        });
-    });
-}
-
-/**
- * @param {number} recipeId
- */
-async function showRecipeDetail(recipedId){
-    try {
-        recipeDetailEl.classList.remove('hidden');
-        recipeDetailEl.innerHTML = '<p class="text-center">Ładowanie...</p>';
-
-        recipesListEl.classList.add('hidden');
-        filtersEl.classList.add('hidden');
-
-        const recipe = await fetchRecipe(recipedId);
-
-        renderRecipeDetail(recipe);
-    } catch (error) {
-        recipeDetailEl.innerHTML = `
-            <p class="text-red-500">Błąd: ${error.message}</p>
-            <button onclick="showRecipesList()"
-                class="mt-4 bg-blue-600 px-4 py-2 rounded">
-                <- Powrót
-            </button>
-        `;
-    }
 
 }
 
@@ -156,7 +96,7 @@ async function renderRecipeDetail(recipe) {
 
     recipeDetailEl.innerHTML = `
         <div class="max-w-2xl mx-auto">
-            <button onclick="showRecipesList()" class="mb-4 text-xl text-blue-400 cursor-pointer hover:text-blue-300">
+            <button data-action="back-to-list" class="mb-4 text-xl text-blue-400 cursor-pointer hover:text-blue-300">
                 ← Powrót do listy
             </button>
 
@@ -193,7 +133,7 @@ async function renderRecipeDetail(recipe) {
             </div>
 
             <div class="mb-6">
-                <h3 class="text-lg font-semibold mb-2 text-blue-400>Przygotowanie</h3>
+                <h3 class="text-lg font-semibold mb-2 text-blue-400">Przygotowanie</h3>
                 <ol class="bg-gray-800 rounded p-4">
                     ${instructionsList || '<li class="text-gray-500">Brak instrukcji</li>'}
                 </ol>
@@ -203,19 +143,6 @@ async function renderRecipeDetail(recipe) {
     `;
 }
 
-const CATEGORIES = [
-    { value: null, label: 'Wszystkie' },
-    { value: 'breakfast', label: '🌅 Śniadanie' },
-    { value: 'lunch', label: '🍽️ Obiad' },
-    { value: 'dinner', label: '🌙 Kolacja' },
-    { value: 'snack', label: '🥨 Przekąska' }
-];
-
-let currentCategory = null;
-
-/**
- * 
- */
 function renderFilters() {
     const html = CATEGORIES.map(cat => `
         <button class="px-4 py-2 rounded transition-colors
@@ -235,72 +162,19 @@ function renderFilters() {
         });
     });
 
-    getStatistics();
+    // Display statistics
+    getStatistics()
+        .then(numberOfRecipes => {
+            filtersEl.insertAdjacentHTML('beforeend', `
+                <span class="ml-auto text-violet-300 font-sans font-semibold">
+                    Liczba przepisów: ${numberOfRecipes}
+                </span>
+            `);
+        })
+        .catch(error => {
+            console.error('Failed to load statistics:', error);
+        });
 
-}
-
-async function filterByCategory(category) {
-    currentCategory = category;
-
-    renderFilters();
-
-    recipeDetailEl.innerHTML = '<p class="col-span-full text-center">Ładowanie...</p>';
-
-    try {
-        const recipes = await fetchRecipes(category);
-        renderRecipesList(recipes);
-    } catch (error) {
-        recipesListEl.innerHTML = `<p class="text-red-500 col-span-full text-center">Błąd: ${error.message}</p>`;
-    }
-}
-
-function showRecipesList(){
-    recipeDetailEl.classList.add('hidden');
-
-    recipesListEl.classList.remove('hidden');
-    filtersEl.classList.remove('hidden');
-}
-
-async function getStatistics() {
-    const count = await fetch(`${API_URL}/statistics`)
-    let numberOfRecipes = await count.json()
-
-    filtersEl.insertAdjacentHTML('beforeend', `
-            <span class="ml-auto text-violet-300 font-sans font-semibold">
-                Liczba przepisów: ${numberOfRecipes}
-            </span>
-        `);
-}
-
-function showRecipesView() {
-    document.getElementById('recipes-view').classList.remove('hidden');
-    document.getElementById('planner-view').classList.add('hidden');
-}
-
-function showPlannerView() {
-    document.getElementById('planner-view').classList.remove('hidden');
-    document.getElementById('recipes-view').classList.add('hidden');
-    loadMealPlan()
-}
-
-let currentDate = new Date();
-
-function formatDate(date) {
-    //"YYYY-MM-DD" Retrive format
-    return date.toISOString().split('T')[0];
-}
-
-function changeDate(days) {
-    currentDate.setDate(currentDate.getDate() + days);
-    document.getElementById('current-date').textContent = formatDate(currentDate);
-    loadMealPlan();
-}
-
-async function loadMealPlan() {
-    const date = formatDate(currentDate);
-    const response = await fetch(`/api/meal-plans?date=${date}`);
-    const plan = await response.json();
-    renderMealPlan(plan);
 }
 
 function renderMealPlan(plan) {
@@ -317,7 +191,7 @@ function renderMealPlan(plan) {
             <div class="bg-gray-800 rounded-lg p-4 mb-4">
                 <div class="flex justify-between items-center mb-2">
                     <h3 class="font-semibold">${type.label}</h3>
-                    <button onclick="addMealPrompt('${type.key}')" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer" data-meal-type="${type.key}">
+                    <button data-action="add-meal" data-meal-type="${type.key}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer">
                         +Dodaj
                     </button>
                 </div>
@@ -338,36 +212,6 @@ function renderMealPlan(plan) {
 
 }
 
-function addMealPrompt(mealType) {
-    const recipeId = prompt('Podaj ID przepisu:');
-    if (recipeId) {
-        addMealToPlan(mealType, parseInt(recipeId));
-    }
-}
-
-async function addMealToPlan(mealType, recipeId, servings = 1) {
-    const response = await fetch('/api/meal-plans', {
-        method: 'POST',
-        headers: {
-            'Content-type': 'application/json'
-        },
-        body: JSON.stringify({
-            date: formatDate(currentDate),
-            meal_type: mealType,
-            recipe_id: recipeId,
-            servings: servings
-        })
-    });
-
-    if (response.ok) {
-        loadMealPlan();
-    } else {
-        const error = await response.json();
-        alert(error.message || 'Błąd dodawania');
-    }
-}
-
-
 function renderMealItem(meal) {
     return `
         <div class="flex justify-between items-center py-2 border-b border-gray-700">
@@ -375,21 +219,9 @@ function renderMealItem(meal) {
                 <span>${meal.recipe_name}</span>
                 <span class="text-gray-400 text-sm ml-2">(${meal.calories_per_serving} kcal)</span>
             </div>
-            <button class="text-red-400 hover:text-red-300">🗑️</button>
+            <button data-action="remove-meal" data-meal-id="${meal.id}" class="text-slate-400 bg-pink-500 font-semibold cursor-pointer rounded-lg p-1 hover:text-red-300">Usuń 🗑️</button>
         </div>
     `
-}
-
-async function removeMeal(mealId) {
-    if(!confirm('Usunąć posiłek z planu?')) return;
-
-    const response = await fetch(`/api/meal-plans/${mealId}`, {
-        method: 'DELETE'
-    });
-
-    if (response.ok) {
-        loadMealPlan();
-    }
 }
 
 function renderDailyTotals(totals) {
@@ -403,15 +235,162 @@ function renderDailyTotals(totals) {
                     <div class="text-xs text-gray-400">kcal</div>
                 </div>
             </div>
-        </div>   
+        </div>
     `;
 }
 
+// EVENT HANDLERS
+
+function addRecipeCardListeners(){
+    const cards = recipesListEl.querySelectorAll('[data-recipe-id]');
+
+    cards.forEach(card => {
+        card.addEventListener('click', () =>{
+            const recipeId = card.dataset.recipeId
+            showRecipeDetail(recipeId);
+        });
+    });
+}
+
+async function filterByCategory(category) {
+    currentCategory = category;
+
+    renderFilters();
+
+    recipeDetailEl.innerHTML = '<p class="col-span-full text-center">Ładowanie...</p>';
+
+    try {
+        const recipes = await fetchRecipes(category);
+        renderRecipesList(recipes);
+    } catch (error) {
+        recipesListEl.innerHTML = `<p class="text-red-500 col-span-full text-center">Błąd: ${error.message}</p>`;
+    }
+}
+
+function formatDate(date) {
+    //"YYYY-MM-DD" Retrive format
+    return date.toISOString().split('T')[0];
+}
+
+function changeDate(days) {
+    currentDate.setDate(currentDate.getDate() + days);
+    document.getElementById('current-date').textContent = formatDate(currentDate);
+    loadMealPlan();
+}
+
+async function addMealPrompt(mealType) {
+    const recipeId = prompt('Podaj ID przepisu:');
+    if (recipeId) {
+        try {
+            await addMealToPlan(formatDate(currentDate), mealType, parseInt(recipeId));
+            loadMealPlan();
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+}
+
+async function handleRemoveMeal(mealId) {
+    if (!confirm('Usunąć posiłek z planu?')) return;
+
+    try {
+        await removeMeal(mealId);
+        loadMealPlan();
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+// UI STATE MANAGEMENT
+
+/**
+ * @param {number} recipeId
+ */
+async function showRecipeDetail(recipedId){
+    try {
+        recipeDetailEl.classList.remove('hidden');
+        recipeDetailEl.innerHTML = '<p class="text-center">Ładowanie...</p>';
+
+        recipesListEl.classList.add('hidden');
+        filtersEl.classList.add('hidden');
+
+        const recipe = await fetchRecipe(recipedId);
+
+        renderRecipeDetail(recipe);
+    } catch (error) {
+        recipeDetailEl.innerHTML = `
+            <p class="text-red-500">Błąd: ${error.message}</p>
+            <button data-action="back-to-list"
+                class="mt-4 bg-blue-600 px-4 py-2 rounded">
+                <- Powrót
+            </button>
+        `;
+    }
+}
+
+function showRecipesList(){
+    recipeDetailEl.classList.add('hidden');
+
+    recipesListEl.classList.remove('hidden');
+    filtersEl.classList.remove('hidden');
+}
+
+async function loadMealPlan() {
+    try {
+        const date = formatDate(currentDate);
+        const plan = await fetchMealPlan(date);
+        renderMealPlan(plan);
+    } catch (error) {
+        console.error('Failed to load meal plan:', error);
+        alert('Nie udało się załadować planu posiłków');
+    }
+}
+
+function showRecipesView() {
+    document.getElementById('recipes-view').classList.remove('hidden');
+    document.getElementById('planner-view').classList.add('hidden');
+}
+
+function showPlannerView() {
+    document.getElementById('planner-view').classList.remove('hidden');
+    document.getElementById('recipes-view').classList.add('hidden');
+    loadMealPlan()
+}
+
+// GLOBAL EVENT DELEGATION
+
+function handleGlobalClick(e) {
+    const action = e.target.dataset.action;
+
+    if(!action) return;
+
+    switch(action) {
+        case 'back-to-list':
+            showRecipesList();
+            break;
+        case 'add-meal':
+            addMealPrompt(e.target.dataset.mealType);
+            break;
+        case 'nav-planner':
+            showPlannerView();
+            break;
+        case 'nav-recipes':
+            showRecipesView();
+            break;
+        case 'remove-meal':
+            handleRemoveMeal(e.target.dataset.mealId);
+            break;
+    }
+}
+
+// INITIALIZATION
 
 async function init() {
     renderFilters();
-    document.getElementById("nav-planner").addEventListener('click', showPlannerView);
-    document.getElementById("nav-recipes").addEventListener('click', showRecipesView);
+
+    // One global click handler for all actions
+    document.addEventListener('click', handleGlobalClick);
+
     try {
         const recipes = await fetchRecipes();
         renderRecipesList(recipes);
@@ -421,4 +400,3 @@ async function init() {
 }
 
 document.addEventListener('DOMContentLoaded', init);
-
