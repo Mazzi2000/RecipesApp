@@ -26,9 +26,9 @@
 
         <div id="planner-view" class="hidden">
             <div id="date-picker" class="flex items-center justify-center gap-4 mb-6">
-                <button id="prev-day">-</button>
-                <span id="current-date">2025-12-09</span>
-                <button id="next-day">+</button>
+                <button data-action="prev-day" class="cursor-pointer text-red-800 text-2xl"><-</button>
+                <span id="current-date"></span>
+                <button data-action="next-day" class="cursor-pointer text-red-800 text-2xl">-></button>
             </div>
             <div id="meal-plan"></div>
             <div id="daily-totals"></div>

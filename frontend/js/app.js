@@ -7,7 +7,6 @@ import {
     fetchMealPlan
 } from './api.js';
 
-//Configuration
 const CATEGORIES = [
     { value: null, label: 'Wszystkie' },
     { value: 'breakfast', label: '🌅 Śniadanie' },
@@ -210,6 +209,8 @@ function renderMealPlan(plan) {
     let totals = plan[plan.length - 1];
     renderDailyTotals(totals);
 
+    updateDateDisplay();
+
 }
 
 function renderMealItem(meal) {
@@ -267,15 +268,24 @@ async function filterByCategory(category) {
     }
 }
 
-function formatDate(date) {
-    //"YYYY-MM-DD" Retrive format
-    return date.toISOString().split('T')[0];
+function updateDateDisplay() {
+    document.getElementById('current-date').textContent = formatDate(currentDate);
 }
 
-function changeDate(days) {
+// Navigates to a different date
+function navigateDate(days) {
     currentDate.setDate(currentDate.getDate() + days);
-    document.getElementById('current-date').textContent = formatDate(currentDate);
+    updateDateDisplay();
     loadMealPlan();
+}
+
+function formatDate(date) {
+    // Use local date, not UTC
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
 }
 
 async function addMealPrompt(mealType) {
@@ -379,6 +389,12 @@ function handleGlobalClick(e) {
             break;
         case 'remove-meal':
             handleRemoveMeal(e.target.dataset.mealId);
+            break;
+        case 'prev-day':
+            navigateDate(-1)
+            break;
+        case 'next-day':
+            navigateDate(1)
             break;
     }
 }
