@@ -116,3 +116,29 @@ export async function fetchMealPlan(date) {
 
     return await response.json();
 }
+
+/**
+ * Get recipes with optional search and category filter
+ * @param {Object} filters - Filter options
+ * @param {string} filters.category - Category filter
+ * @param {string} filters.search - Search term
+ * @returns {Promise<Array>} Filtered recipes
+ */
+export async function searchRecipes({ category = null, search = null } = {}) {
+    let url = `${API_URL}/recipes`;
+    const params = [];
+    
+    if (category) params.push(`category=${category}`);
+    if (search) params.push(`search=${encodeURIComponent(search)}`);
+    
+    if (params.length > 0) {
+        url += '?' + params.join('&');
+    }
+    
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error(`HTTP error! status ${response.status}`);
+    }
+    
+    return await response.json();
+}

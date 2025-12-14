@@ -6,6 +6,7 @@ import {
     getStatistics,
     fetchMealPlan
 } from './api.js';
+import modal  from './modal.js';
 
 const CATEGORIES = [
     { value: null, label: 'Wszystkie' },
@@ -18,6 +19,7 @@ const CATEGORIES = [
 // State
 let currentDate = new Date();
 let currentCategory = null;
+let recipesCache = null;
 
 // DOM REFERENCES
 const recipesListEl = document.getElementById('recipes-list');
@@ -220,9 +222,14 @@ function renderMealItem(meal) {
                 <span>${meal.recipe_name}</span>
                 <span class="text-gray-400 text-sm ml-2">(${meal.calories_per_serving} kcal)</span>
             </div>
-            <button data-action="remove-meal" data-meal-id="${meal.id}" class="text-slate-400 bg-pink-500 font-semibold cursor-pointer rounded-lg p-1 hover:text-red-300">Usuń 🗑️</button>
+            <button
+                data-action="remove-meal" 
+                data-meal-id="${meal.id}" 
+                class="rounded-md bg-pink-500 px-2.5 py-1.5 text-sm font-semibold text-white hover:bg-pink-600 transition-colors">
+                    Usuń 🗑️
+            </button>
         </div>
-    `
+    `;
 }
 
 function renderDailyTotals(totals) {
@@ -289,28 +296,53 @@ function formatDate(date) {
 }
 
 async function addMealPrompt(mealType) {
-    const recipeId = prompt('Podaj ID przepisu:');
-    if (recipeId) {
-        try {
-            await addMealToPlan(formatDate(currentDate), mealType, parseInt(recipeId));
-            loadMealPlan();
-        } catch (error) {
-            alert(error.message);
-        }
-    }
+    showAddMealModal(mealType);
 }
 
 async function handleRemoveMeal(mealId) {
-    if (!confirm('Usunąć posiłek z planu?')) return;
+    // Get meal name for the modal
+    const mealElement = document.querySelector(`[data-meal-id="${mealId}"]`).closest('.flex');
+    const mealName = mealElement.querySelector('span').textContent;
 
-    try {
-        await removeMeal(mealId);
-        loadMealPlan();
-    } catch (error) {
-        alert(error.message);
-    }
+    // Clean, simple body (no buttons needed!)
+    const bodyHTML = `
+        <div class="text-center">
+            <div class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-red-500/10 mb-4">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="size-6 text-red-400">
+                    <path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-white mb-2">Usunąć posiłek?</h3>
+            <p class="text-sm text-gray-400">${mealName} zostanie usunięty z Twojego planu.</p>
+        </div>
+    `;
+
+    modal.open({
+        title: 'Usuń posiłek',
+        body: bodyHTML,
+        confirmText: 'Usuń',
+        cancelText: 'Anuluj', 
+        onConfirm: async () => {    
+            try {
+                // Show loading
+                modal.container.innerHTML = `
+                    <div class="p-8 text-center">
+                        <div class="text-4xl mb-4">⏳</div>
+                        <p class="text-gray-400">Usuwanie...</p>
+                    </div>
+                `;
+                
+                await removeMeal(mealId);
+                modal.close();
+                await loadMealPlan();
+                showToast('✅ Posiłek usunięty!');
+            } catch (error) {
+                modal.close();
+                alert('Błąd: ' + error.message);
+            }
+        }
+    });
 }
-
 // UI STATE MANAGEMENT
 
 /**
@@ -367,6 +399,174 @@ function showPlannerView() {
     loadMealPlan()
 }
 
+/**
+ * Show modal to add meal to plan
+ * @param {string} mealType - Type of meal (breakfast, lunch, dinner, snack)
+ */
+async function showAddMealModal(mealType) {
+    const mealTypeLabels = {
+        'breakfast': '🌅 Śniadanie',
+        'lunch': '🍽️ Obiad',
+        'dinner': '🌙 Kolacja',
+        'snack': '🥨 Przekąska'
+    };
+    
+    // Load recipes if not cached
+    if (!recipesCache) {
+        try {
+            recipesCache = await fetchRecipes();
+        } catch (error) {
+            alert('Błąd ładowania przepisów');
+            return;
+        }
+    }
+    
+    // Filter recipes by meal type (optional)
+    const filteredRecipes = recipesCache.filter(r => r.category === mealType);
+    const recipesToShow = filteredRecipes.length > 0 ? filteredRecipes : recipesCache;
+    
+    // Create modal body
+    const bodyHTML = `
+        <div class="mb-4">
+            <input 
+                type="text" 
+                id="recipe-search" 
+                placeholder="Szukaj przepisu..."
+                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500"
+            />
+        </div>
+        <div id="recipe-list" class="space-y-2">
+            ${renderRecipeOptions(recipesToShow)}
+        </div>
+    `;
+    
+    modal.open({
+        title: `Dodaj posiłek: ${mealTypeLabels[mealType]}`,
+        body: bodyHTML,
+        onClose: () => {
+            console.log('Modal closed');
+        }
+    });
+    
+    // Add search functionality
+    setupRecipeSearch(recipesToShow, mealType);
+}
+
+/**
+ * Render recipe options for modal
+ * @param {Array} recipes - Array of recipes
+ * @returns {string} HTML string
+ */
+function renderRecipeOptions(recipes) {
+    if (recipes.length === 0) {
+        return '<p class="text-gray-400 text-center py-4">Brak przepisów</p>';
+    }
+    
+    return recipes.map(recipe => `
+        <button 
+            class="recipe-option w-full text-left p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors flex justify-between items-center"
+            data-recipe-id="${recipe.id}"
+        >
+            <div>
+                <div class="font-semibold text-teal-400">${recipe.name}</div>
+                <div class="text-sm text-gray-400">
+                    🔥 ${recipe.calories_per_serving} kcal | 
+                    💪 ${recipe.protein_per_serving}g białka
+                </div>
+            </div>
+            <div class="text-2xl">→</div>
+        </button>
+    `).join('');
+}
+
+/**
+ * Setup search functionality in modal
+ * @param {Array} recipes - All recipes
+ * @param {string} mealType - Current meal type
+ */
+function setupRecipeSearch(recipes, mealType) {
+    const searchInput = document.getElementById('recipe-search');
+    const recipeList = document.getElementById('recipe-list');
+    
+    // Search handler
+    searchInput.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        const filtered = recipes.filter(recipe => 
+            recipe.name.toLowerCase().includes(searchTerm)
+        );
+        recipeList.innerHTML = renderRecipeOptions(filtered);
+        attachRecipeClickHandlers(mealType);
+    });
+    
+    // Attach click handlers
+    attachRecipeClickHandlers(mealType);
+}
+
+/**
+ * Attach click handlers to recipe options
+ * @param {string} mealType - Current meal type
+ */
+function attachRecipeClickHandlers(mealType) {
+    document.querySelectorAll('.recipe-option').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const recipeId = parseInt(btn.dataset.recipeId);
+            await handleAddMeal(mealType, recipeId);
+        });
+    });
+}
+
+/**
+ * Handle adding meal to plan
+ * @param {string} mealType - Type of meal
+ * @param {number} recipeId - Recipe ID
+ */
+async function handleAddMeal(mealType, recipeId) {
+    try {
+        // Show loading state (optional)
+        const originalContent = modal.container.innerHTML;
+        modal.container.innerHTML = `
+            <div class="p-8 text-center">
+                <div class="text-4xl mb-4">⏳</div>
+                <p>Dodawanie posiłku...</p>
+            </div>
+        `;
+        
+        // Add meal to plan
+        await addMealToPlan(formatDate(currentDate), mealType, recipeId, 1);
+        
+        // Close modal
+        modal.close();
+        
+        // Reload meal plan
+        await loadMealPlan();
+        
+        // Show success message (optional)
+        showToast('✅ Posiłek dodany do planu!');
+        
+    } catch (error) {
+        console.error('Error adding meal:', error);
+        alert('Błąd dodawania posiłku: ' + error.message);
+        modal.close();
+    }
+}
+
+/**
+ * Show temporary toast notification
+ * @param {string} message - Message to display
+ */
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in';
+    toast.textContent = message;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.add('animate-fade-out');
+        setTimeout(() => document.body.removeChild(toast), 300);
+    }, 3000);
+}
+
 // GLOBAL EVENT DELEGATION
 
 function handleGlobalClick(e) {
@@ -416,3 +616,4 @@ async function init() {
 }
 
 document.addEventListener('DOMContentLoaded', init);
+export { showAddMealModal };
