@@ -79,22 +79,8 @@ function renderRecipesList(recipes) {
  * @param {Object} recipe
  */
 async function renderRecipeDetail(recipe) {
-    const ingredientsList = recipe.ingredients.map(
-        ing => {
-            const amount =  ing.amount > 0 ? `${ing.amount} ${ing.unit}` : ing.unit;
-            const notes = ing.notes ? ` (${ing.notes})` : '';
-            return `<li class="py-1">${amount} ${ing.name}${notes}</li>`;
-        }
-    ).join('');
-
-    const instructions = JSON.parse(recipe.instructions || '[]');
-    const instructionsList = instructions.map((step, index) => `
-        <li class="py-2">
-            <span class="font-bold text-blue-400">${index +1}.</span>${step}
-        </li>
-    `)
-    .join('');
-
+    const detailHTML = createRecipeDetailHTML(recipe);
+    
     recipeDetailEl.innerHTML = `
         <div class="max-w-2xl mx-auto">
             <button data-action="back-to-list" class="mb-4 text-xl text-blue-400 cursor-pointer hover:text-blue-300">
@@ -103,53 +89,114 @@ async function renderRecipeDetail(recipe) {
 
             <h2 class="text-2xl font-bold text-orange-300 mb-4">${recipe.name}</h2>
 
-            <div class="grid grid-cols-4 gap-4 mb-6 text-center">
-                <div class="bg gray-800 p-3 rounded">
-                    <div class="text-2xl">🔥</div>
-                    <div class="font-bold">${recipe.calories_per_serving}</div>
-                    <div class="text-xs text-gray-400">kcal</div>
-                </div>
-                <div class="bg gray-800 p-3 rounded">
-                    <div class="text-2xl">💪</div>
-                    <div class="font-bold">${recipe.protein_per_serving}g</div>
-                    <div class="text-xs text-gray-400">białko</div>
-                </div>
-                <div class="bg gray-800 p-3 rounded">
-                    <div class="text-2xl">🧈</div>
-                    <div class="font-bold">${recipe.fat_per_serving}g</div>
-                    <div class="text-xs text-gray-400">tłuszcz</div>
-                </div>
-                <div class="bg gray-800 p-3 rounded">
-                    <div class="text-2xl">🍞</div>
-                    <div class="font-bold">${recipe.carbs_per_serving}g</div>
-                    <div class="text-xs text-gray-400">węgle</div>
-                </div>
-            </div>
+            ${detailHTML}
+        </div>
+    `;
+}
 
-            <div class="mb-6">
-                <h3 class="text-lg font-semibold mb-2 text-blue-400">Składniki</h3>
-                <ul class="bg-gray-800 rounded p-4">
-                    ${ingredientsList}
-                </ul>
-            </div>
+async function showRecipeDetailInModal(recipeId) {
+    try {
+        // Show loading modal
+        modal.open({
+            title: 'Ładowanie przepisu...',
+            body: '<div class="p-8 text-center"><div class="text-4xl mb-4">⏳</div></div>'
+        });
+        
+        // Fetch recipe
+        const recipe = await fetchRecipe(recipeId);
+        
+        // Create recipe detail HTML (reuse your existing template)
+        const bodyHTML = createRecipeDetailHTML(recipe);
+        
+        // Show in modal
+        modal.open({
+            title: recipe.name,
+            body: bodyHTML,
+            onClose: () => {
+                console.log('Recipe modal closed');
+            }
+        });
+        
+    } catch (error) {
+        modal.close();
+        alert('Błąd ładowania przepisu: ' + error.message);
+    }
+}
 
-            <div class="mb-6">
-                <h3 class="text-lg font-semibold mb-2 text-blue-400">Przygotowanie</h3>
-                <ol class="bg-gray-800 rounded p-4">
-                    ${instructionsList || '<li class="text-gray-500">Brak instrukcji</li>'}
-                </ol>
+/**
+ * Create recipe detail HTML (reusable for both page and modal)
+ * @param {Object} recipe - Recipe object with ingredients
+ * @returns {string} HTML string
+ */
+function createRecipeDetailHTML(recipe) {
+    const ingredientsList = recipe.ingredients.map(
+        ing => {
+            const amount = ing.amount > 0 ? `${ing.amount} ${ing.unit}` : ing.unit;
+            const notes = ing.notes ? ` (${ing.notes})` : '';
+            return `<li class="py-1">${amount} ${ing.name}${notes}</li>`;
+        }
+    ).join('');
+
+    let instructions = [];
+    try {
+        instructions = JSON.parse(recipe.instructions || '[]');
+    } catch (e) {
+        console.error('Invalid instructions JSON:', e);
+    }
+
+    const instructionsList = instructions.map((step, index) => `
+        <li class="py-2">
+            <span class="font-bold text-blue-400">${index + 1}.</span> ${step}
+        </li>
+    `).join('');
+
+    return `
+        <div class="grid grid-cols-4 gap-4 mb-6 text-center">
+            <div class="bg-gray-800 p-3 rounded">
+                <div class="text-2xl">🔥</div>
+                <div class="font-bold">${recipe.calories_per_serving}</div>
+                <div class="text-xs text-gray-400">kcal</div>
+            </div>
+            <div class="bg-gray-800 p-3 rounded">
+                <div class="text-2xl">💪</div>
+                <div class="font-bold">${recipe.protein_per_serving}g</div>
+                <div class="text-xs text-gray-400">białko</div>
+            </div>
+            <div class="bg-gray-800 p-3 rounded">
+                <div class="text-2xl">🧈</div>
+                <div class="font-bold">${recipe.fat_per_serving}g</div>
+                <div class="text-xs text-gray-400">tłuszcz</div>
+            </div>
+            <div class="bg-gray-800 p-3 rounded">
+                <div class="text-2xl">🍞</div>
+                <div class="font-bold">${recipe.carbs_per_serving}g</div>
+                <div class="text-xs text-gray-400">węgle</div>
             </div>
         </div>
 
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold mb-2 text-blue-400">Składniki</h3>
+            <ul class="bg-gray-800 rounded p-4">
+                ${ingredientsList}
+            </ul>
+        </div>
+
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold mb-2 text-blue-400">Przygotowanie</h3>
+            <ol class="bg-gray-800 rounded p-4">
+                ${instructionsList || '<li class="text-gray-500">Brak instrukcji</li>'}
+            </ol>
+        </div>
     `;
 }
+
 
 function renderFilters() {
     const html = CATEGORIES.map(cat => `
         <button class="px-4 py-2 rounded transition-colors
             ${cat.value === currentCategory
                 ? 'bg-blue-600 text-white'
-                : 'bg-gray-700 hover:bg-gray-600'}"
+                : 'bg-gray-700 hover:bg-gray-600 cursor-pointer'}"
             data-category="${cat.value}">${cat.label}
         </button>
     `).join('');
@@ -208,18 +255,20 @@ function renderMealPlan(plan) {
 
     document.getElementById('meal-plan').innerHTML = html;
 
-    let totals = plan[plan.length - 1];
-    renderDailyTotals(totals);
+    addMealCardListeners()
+    if (plan.length > 0) {
+        let totals = plan[plan.length - 1];
+        renderDailyTotals(totals);
+    }
 
     updateDateDisplay();
-
 }
 
 function renderMealItem(meal) {
     return `
         <div class="flex justify-between items-center py-2 border-b border-gray-700">
             <div>
-                <span>${meal.recipe_name}</span>
+                <span data-recipe-id="${meal.recipe_id}" class="cursor-pointer hover:underline hover:text-blue-500 transition-all duration-200">${meal.recipe_name}</span>
                 <span class="text-gray-400 text-sm ml-2">(${meal.calories_per_serving} kcal)</span>
             </div>
             <button
@@ -249,6 +298,16 @@ function renderDailyTotals(totals) {
 
 // EVENT HANDLERS
 
+function addMealCardListeners() {
+    const cards = document.getElementById('meal-plan').querySelectorAll('[data-recipe-id]');
+    cards.forEach(card => {
+        card.addEventListener('click', () => {
+            const recipeId = card.dataset.recipeId;
+            showRecipeDetailInModal(recipeId);
+        });
+    });
+}
+
 function addRecipeCardListeners(){
     const cards = recipesListEl.querySelectorAll('[data-recipe-id]');
 
@@ -265,7 +324,7 @@ async function filterByCategory(category) {
 
     renderFilters();
 
-    recipeDetailEl.innerHTML = '<p class="col-span-full text-center">Ładowanie...</p>';
+    recipesListEl.innerHTML = '<p class="col-span-full text-center">Ładowanie...</p>';
 
     try {
         const recipes = await fetchRecipes(category);
@@ -295,14 +354,19 @@ function formatDate(date) {
     return `${year}-${month}-${day}`;
 }
 
-async function addMealPrompt(mealType) {
+function addMealPrompt(mealType) {
     showAddMealModal(mealType);
 }
 
 async function handleRemoveMeal(mealId) {
     // Get meal name for the modal
-    const mealElement = document.querySelector(`[data-meal-id="${mealId}"]`).closest('.flex');
-    const mealName = mealElement.querySelector('span').textContent;
+    const mealButton = document.querySelector(`[data-meal-id="${mealId}"]`);
+    if (!mealButton) {
+        console.error('Meal not found');
+        return;
+    }
+    const mealElement = mealButton.closest('.flex');
+    const mealName = mealElement?.querySelector('span')?.textContent || 'Ten posiłek';
 
     // Clean, simple body (no buttons needed!)
     const bodyHTML = `
@@ -348,7 +412,7 @@ async function handleRemoveMeal(mealId) {
 /**
  * @param {number} recipeId
  */
-async function showRecipeDetail(recipedId){
+async function showRecipeDetail(recipeId){
     try {
         recipeDetailEl.classList.remove('hidden');
         recipeDetailEl.innerHTML = '<p class="text-center">Ładowanie...</p>';
@@ -356,7 +420,7 @@ async function showRecipeDetail(recipedId){
         recipesListEl.classList.add('hidden');
         filtersEl.classList.add('hidden');
 
-        const recipe = await fetchRecipe(recipedId);
+        const recipe = await fetchRecipe(recipeId);
 
         renderRecipeDetail(recipe);
     } catch (error) {
