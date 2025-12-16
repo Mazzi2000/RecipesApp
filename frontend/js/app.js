@@ -269,7 +269,7 @@ function renderMealItem(meal) {
         <div class="flex justify-between items-center py-2 border-b border-gray-700">
             <div>
                 <span data-recipe-id="${meal.recipe_id}" class="cursor-pointer hover:underline hover:text-blue-500 transition-all duration-200">${meal.recipe_name}</span>
-                <span class="text-gray-400 text-sm ml-2">(${meal.calories_per_serving} kcal)</span>
+                <span class="text-gray-400 text-sm ml-2">(${meal.calories_per_serving * meal.servings} kcal)</span>
             </div>
             <button
                 data-action="remove-meal" 

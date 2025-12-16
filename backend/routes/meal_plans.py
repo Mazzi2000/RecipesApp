@@ -89,6 +89,45 @@ def add_plans():
         'message': 'Meal plan created successfully'
     }), 201
 
+@meal_plans_bp.route('/meal-plans/<int:meal_id>', methods=['PATCH'])
+def update_meal(meal_id):
+    conn = get_db_connection()
+
+    data = request.get_json()
+
+    if not data:
+        return jsonify({'error': 'No JSON data'}), 400
+
+    servings = data.get('servings')
+
+    if servings is None:
+        return jsonify({'error': 'Missing field: servings'}), 400
+    
+    if servings < 0:
+        return jsonify({'error': 'Servings must be positive number'}), 400
+    
+    existing = conn.execute(
+        'SELECT * from meal_plans WHERE id = ?', (meal_id,) 
+    ).fetchone()
+
+    if not existing:
+        conn.close()
+        return jsonify({'error': 'Meal plan not found'}), 404
+    
+    conn.execute(
+        'UPDATE meal_plans SET servings = ? WHERE id =?',
+        (servings, meal_id)
+    )
+    conn.commit()
+    conn.close()
+
+    return jsonify({
+        'id': meal_id,
+        'servings': servings,
+        'message': 'Servings updated successfully'
+    })
+
+
 @meal_plans_bp.route('/meal-plans/<int:meal_id>', methods = ['DELETE'])
 def delete_meal(meal_id):
     conn = get_db_connection()
