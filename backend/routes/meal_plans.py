@@ -32,15 +32,20 @@ def get_meal_plans():
     meals_list = []
  
     for meal in meals:
-        meals_list.append(dict(meal))
-        totals['calories'] += meal['calories_per_serving'] * meal['servings']
-        totals['protein'] += meal['protein_per_serving'] * meal['servings']
-        totals['fat'] += meal['fat_per_serving'] * meal['servings']
-        totals['carbs'] += meal['carbs_per_serving'] * meal['servings']
+        meal_dict = dict(meal)
+        meals_list.append(meal_dict)
 
-    meals_list.append(totals)
+        servings = meal['servings'] or 1
+        totals['calories'] += meal['calories_per_serving'] * servings
+        totals['protein'] += meal['protein_per_serving'] * servings
+        totals['fat'] += meal['fat_per_serving'] * servings
+        totals['carbs'] += meal['carbs_per_serving'] * servings
 
-    return jsonify(meals_list)
+    return jsonify({
+        'date': date,
+        'meals': meals_list,
+        'totals': totals
+    })
 
 def is_valid_date(date_string):
     try:

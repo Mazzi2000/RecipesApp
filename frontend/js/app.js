@@ -4,7 +4,8 @@ import {
     addMealToPlan,
     removeMeal,
     getStatistics,
-    fetchMealPlan
+    fetchMealPlan,
+    updateMealServings
 } from './api.js';
 import modal  from './modal.js';
 
@@ -226,6 +227,9 @@ function renderFilters() {
 }
 
 function renderMealPlan(plan) {
+    const meals = plan.meals || [];
+    const totals = plan.totals || {calories: 0, protein: 0, fat: 0, carbs: 0};
+
     const mealTypes = [
         { key: 'breakfast', label: '🌅 Śniadanie' },
         { key: 'lunch', label: '🍽️ Obiad' },
@@ -233,7 +237,7 @@ function renderMealPlan(plan) {
         { key: 'snack', label: '🥨 Przekąska' }
     ];
     const html = mealTypes.map(type => {
-        const meals = plan.filter(m => m.meal_type === type.key);
+        const mealsOfType = meals.filter(m => m.meal_type === type.key);
 
         return `
             <div class="bg-gray-800 rounded-lg p-4 mb-4">
@@ -244,8 +248,8 @@ function renderMealPlan(plan) {
                     </button>
                 </div>
                 <div class="">
-                    ${meals.length > 0
-                        ? meals.map(m=> renderMealItem(m)).join('')
+                    ${mealsOfType.length > 0
+                        ? mealsOfType.map(m=> renderMealItem(m)).join('')
                         : '<p class="text-gray-500 text-sm">Brak posiłków</p>'
                     }
                 </div>
@@ -256,20 +260,43 @@ function renderMealPlan(plan) {
     document.getElementById('meal-plan').innerHTML = html;
 
     addMealCardListeners()
-    if (plan.length > 0) {
-        let totals = plan[plan.length - 1];
-        renderDailyTotals(totals);
-    }
-
+    renderDailyTotals(totals);
     updateDateDisplay();
 }
 
 function renderMealItem(meal) {
+    const totalCalories = Math.round(meal.calories_per_serving * meal.servings);
     return `
         <div class="flex justify-between items-center py-2 border-b border-gray-700">
-            <div>
-                <span data-recipe-id="${meal.recipe_id}" class="cursor-pointer hover:underline hover:text-blue-500 transition-all duration-200">${meal.recipe_name}</span>
-                <span class="text-gray-400 text-sm ml-2">(${meal.calories_per_serving * meal.servings} kcal)</span>
+            <div class="flex-1">
+                <span data-recipe-id="${meal.recipe_id}" class="cursor-pointer hover:underline hover:text-blue-500 transition-all duration-200">
+                    ${meal.recipe_name}
+                </span>
+                <span class="text-gray-400 text-sm ml-2">
+                    (${totalCalories} kcal)
+                </span>
+            </div>
+
+            <!-- Servings controls -->
+            <div class="flex items-center gap-2 mx-4">
+                <button
+                    data-action="decrease-servings"
+                    data-meal-id="${meal.id}"
+                    data-current-servings="${meal.servings}"
+                    class="w-8 h-8 rounded bg-gray-700 hover:bg-gray-600 text-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                    ${meal.servings <= 0.5 ? 'disabled' : ''}>
+                    -
+                </button>
+                <span class="w-12 text-center font-semibold">
+                    ${meal.servings}
+                </span>
+                <button 
+                    data-action="increase-servings"
+                    data-meal-id="${meal.id}"
+                    data-current-servings="${meal.servings}"
+                    class="w-8 h-8 rounded bg-gray-700 hover:bg-gray-600 text-lg font-bold">
+                    +
+                </button>
             </div>
             <button
                 data-action="remove-meal" 
@@ -285,11 +312,26 @@ function renderDailyTotals(totals) {
     document.getElementById('daily-totals').innerHTML = `
         <div class="bg-gray-800 rounded-lg p-4 mt-6">
             <h3 class="font-semibold mb-3">📊 Podsumowanie dnia</h3>
-            <div class="grid grid-cols-4 gap-4 text=center">
+            <div class="grid grid-cols-4 gap-4 text-center">
                 <div>
                     <div class="text-2xl">🔥</div>
-                    <div class="font-bold">${totals.calories}</div>
+                    <div class="font-bold text-xl">${Math.round(totals.calories)}</div>
                     <div class="text-xs text-gray-400">kcal</div>
+                </div>
+                <div>
+                    <div class="text-2xl">💪</div>
+                    <div class="font-bold text-xl">${Math.round(totals.protein)}g</div>
+                    <div class="text-xs text-gray-400">białko</div>
+                </div>
+                <div>
+                    <div class="text-2xl">🧈</div>
+                    <div class="font-bold text-xl">${Math.round(totals.fat)}g</div>
+                    <div class="text-xs text-gray-400">tłuszcz</div>
+                </div>
+                <div>
+                    <div class="text-2xl">🍞</div>
+                    <div class="font-bold text-xl">${Math.round(totals.carbs)}g</div>
+                    <div class="text-xs text-gray-400">węgle</div>
                 </div>
             </div>
         </div>
@@ -615,6 +657,27 @@ async function handleAddMeal(mealType, recipeId) {
 }
 
 /**
+ * Handle servings change
+ * @param {string} mealId
+ * @param {number} mealServings
+ */
+async function handleServingsChange(mealId, newServings){
+    if (newServings < 0.5){
+        return;
+    }
+
+    try {
+        await updateMealServings(mealId, newServings)
+
+        await loadMealPlan();
+
+    } catch (error) {
+        console.error('Error updating servings:', error);
+        showToast('❌ Błąd zmiany porcji');       
+    }
+}
+
+/**
  * Show temporary toast notification
  * @param {string} message - Message to display
  */
@@ -659,6 +722,18 @@ function handleGlobalClick(e) {
             break;
         case 'next-day':
             navigateDate(1)
+            break;
+        case 'increase-servings':
+            handleServingsChange(
+                e.target.dataset.mealId,
+                parseFloat(e.target.dataset.currentServings) + 0.5
+            );
+            break;
+        case 'decrease-servings':
+            handleServingsChange(
+                e.target.dataset.mealId,
+                parseFloat(e.target.dataset.currentServings) - 0.5
+            );
             break;
     }
 }

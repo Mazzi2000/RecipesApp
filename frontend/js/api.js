@@ -142,3 +142,27 @@ export async function searchRecipes({ category = null, search = null } = {}) {
     
     return await response.json();
 }
+
+/**
+ * Update servings for a meal plan entry
+ * @param {number} mealId
+ * @param {servings} servings
+ * @returns {Promise<Object>}
+ */
+export async function updateMealServings(mealId, servings) {
+    const response = await fetch(`/api/meal-plans/${mealId}`,{
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            servings: servings
+        })
+    });
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Błąd aktualizacji porcji');
+    }
+
+    return await response.json();
+}
