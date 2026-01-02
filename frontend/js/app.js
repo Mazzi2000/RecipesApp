@@ -497,11 +497,13 @@ async function loadMealPlan() {
 function showRecipesView() {
     document.getElementById('recipes-view').classList.remove('hidden');
     document.getElementById('planner-view').classList.add('hidden');
+    showRecipesList();
 }
 
 function showPlannerView() {
     document.getElementById('planner-view').classList.remove('hidden');
     document.getElementById('recipes-view').classList.add('hidden');
+    document.getElementById('recipe-detail').classList.add('hidden');
     loadMealPlan()
 }
 
@@ -718,10 +720,10 @@ function handleGlobalClick(e) {
             handleRemoveMeal(e.target.dataset.mealId);
             break;
         case 'prev-day':
-            navigateDate(-1)
+            navigateDate(-1);
             break;
         case 'next-day':
-            navigateDate(1)
+            navigateDate(1);
             break;
         case 'increase-servings':
             handleServingsChange(
