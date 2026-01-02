@@ -1,15 +1,10 @@
 # 🍽️ RecipesApp
 
  
-
 A meal planning app that helps you store your favorite recipes in one place, plan meals for upcoming days, and track macronutrients and calories.
 
- 
-
-## Screenshots
 
  
-
 ### Recipe List
 
 ![Recipe List](docs/screenshots/RecipeListView.png)
@@ -64,7 +59,7 @@ A meal planning app that helps you store your favorite recipes in one place, pla
 
 ## Getting Started
 
- 
+**Note:** The UI is currently in Polish only.
 
 ### Prerequisites
 
@@ -194,10 +189,3 @@ RecipesApp/
 
 🚧 Learning project - actively developed
 
- 
-
----
-
- 
-
-Built as a portfolio project while learning modern web development.
