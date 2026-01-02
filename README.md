@@ -79,7 +79,7 @@ A meal planning app that helps you store your favorite recipes in one place, pla
 
 # Clone the repository
 
-git clone https://github.com/YOUR_USERNAME/RecipesApp.git
+git clone https://github.com/Mazzi2000/RecipesApp
 
 cd RecipesApp
 
