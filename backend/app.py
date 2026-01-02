@@ -25,8 +25,8 @@ app.register_blueprint(meal_plans_bp)
 @app.errorhandler(404)
 def request_error(error):
     return jsonify({
-        "error": "Not faound the page",
-        "messgae": "Requested page doesnt exisits"
+        "error": "Not found the page",
+        "message": "Requested page doesnt exisits"
     }),404
 
 
