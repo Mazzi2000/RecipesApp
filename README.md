@@ -12,7 +12,7 @@ A meal planning app that helps you store your favorite recipes in one place, pla
 
 ### Recipe List
 
-![Recipe List](screenshots/recipe-list.png)
+![Recipe List](docs/screenshots/RecipeListView.png)
 
 *Browse all recipes with category filters (Breakfast, Lunch, Dinner, Snack)*
 
@@ -20,7 +20,7 @@ A meal planning app that helps you store your favorite recipes in one place, pla
 
 ### Meal Planner
 
-![Meal Planner](screenshots/meal-planner.png)
+![Meal Planner](docs/screenshots/MealPlannerView.png)
 
 *Plan your daily meals and see total macro summary*
 
@@ -28,7 +28,7 @@ A meal planning app that helps you store your favorite recipes in one place, pla
 
 ### Recipe Detail
 
-![Recipe Detail](screenshots/recipe-detail.png)
+![Recipe Detail](docs/screenshots/RecipeDetail.png)
 
 *View ingredients, instructions, and nutritional info per serving*
 
