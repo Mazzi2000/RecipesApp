@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, abort, request, Blueprint
 from database import get_db_connection
+import json
 
 recipes_bp = Blueprint('recipes', __name__)
 
@@ -50,3 +51,74 @@ def get_recipe(recipe_id):
     result['ingredients'] = [dict(ing) for ing in ingredients]
 
     return jsonify(result)
+
+@recipes_bp.route("/api/recipes", methods=['POST'])
+def create_recipe():
+    data = request.get_json()
+
+    if not data:
+        return jsonify({'error' : 'No JSON data'}), 400
+    
+    required_fields = ['name', 'category']
+    for field in required_fields:
+        if field not in data or not data[field]:
+            return jsonify({'error': f"Missing required field: {field}"}), 400
+        
+    if data['category'] not in VALID_CATEGORIES:
+        return jsonify({
+            'error': 'Invalid category',
+            'valid_categories': VALID_CATEGORIES
+        }),400
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute('''
+            INSERT INTO recipes
+                       (name, category, prep_time_minutes, servings, instructions, calories_per_serving, protein_per_serving, fat_per_serving, carbs_per_serving, tags, source, notes)
+                       VALUES(?,?,?,?,?,?,?,?,?,?,?,?)
+            ''', (
+                data['name'],
+                data['category'],
+                data.get('prep_time_minutes'),
+                data.get('servings', 1),
+                json.dumps(data.get('instructions', [])),
+                data.get('calories_per_serving', 0),
+                data.get('protein_per_serving', 0),
+                data.get('fat_per_serving', 0),
+                data.get('carbs_per_serving', 0),
+                json.dumps(data.get('tags', [])),
+                data.get('source', 'manual'),
+                data.get('notes')
+            ))
+        recipe_id = cursor.lastrowid
+
+        ingredients = data.get('ingredients', [])
+        for ing in ingredients:
+            cursor.execute('''
+                INSERT INTO ingredients (recipe_id, name, amount, unit, notes)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (
+                recipe_id,
+                ing.get('name', ''),
+                ing.get('amount', 0),
+                ing.get('unit', ''),
+                ing.get('notes')
+            ))
+
+        conn.commit()
+
+        return jsonify({
+            'id': recipe_id,
+            'message': 'Recipe created successfully'
+        }), 201
+    
+    except Exception as e:
+        conn.rollback()
+        return jsonify({'error': str(e)}), 500
+    
+    finally:
+        conn.close()
+
+    
