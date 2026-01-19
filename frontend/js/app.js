@@ -3,6 +3,7 @@ import {
     fetchRecipe,
     addMealToPlan,
     removeMeal,
+    removeRecipe,
     getStatistics,
     fetchMealPlan,
     updateMealServings,
@@ -85,9 +86,17 @@ async function renderRecipeDetail(recipe) {
     
     recipeDetailEl.innerHTML = `
         <div class="max-w-2xl mx-auto">
-            <button data-action="back-to-list" class="mb-4 text-xl text-blue-400 cursor-pointer hover:text-blue-300">
-                ← Powrót do listy
-            </button>
+            <div class="flex justify-between">
+                <button data-action="back-to-list" class="mb-4 text-xl text-blue-400 cursor-pointer hover:text-blue-300">
+                    ← Powrót do listy
+                </button>
+                <button
+                    data-action="remove-recipe" 
+                    data-recipe-id="${recipe.id}" 
+                    class="rounded-md bg-pink-500 px-2.5 py-1.5 text-sm font-semibold text-white hover:bg-pink-600 transition-colors cursor-pointer">
+                        Usuń 🗑️
+                </button>
+            </div>
 
             <h2 class="text-2xl font-bold text-orange-300 mb-4">${recipe.name}</h2>
 
@@ -401,6 +410,58 @@ function addMealPrompt(mealType) {
     showAddMealModal(mealType);
 }
 
+async function handleRemoveRecipe(recipeId) {
+    // Get meal name for the modal
+    const recipeButton = document.querySelector(`[data-recipe-id="${recipeId}"]`);
+    if (!recipeButton) {
+        console.error('Recipe not found');
+        return;
+    }
+    const recipeElement = recipeButton.closest('.flex');
+    const recipeName = recipeElement?.querySelector('span')?.textContent || 'Ten przepis';
+
+    // Clean, simple body (no buttons needed!)
+    const bodyHTML = `
+        <div class="text-center">
+            <div class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-red-500/10 mb-4">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="size-6 text-red-400">
+                    <path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-white mb-2">Usunąć przepis?</h3>
+            <p class="text-sm text-gray-400">${recipeName} zostanie usunięty z bazy.</p>
+        </div>
+    `;
+
+    modal.open({
+        title: 'Usuń przepis',
+        body: bodyHTML,
+        confirmText: 'Usuń',
+        cancelText: 'Anuluj', 
+        onConfirm: async () => {    
+            try {
+                modal.container.innerHTML = `
+                    <div class="p-8 text-center">
+                        <div class="text-4xl mb-4">⏳</div>
+                        <p class="text-gray-400">Usuwanie...</p>
+                    </div>
+                `;
+                
+                await removeRecipe(recipeId);
+                modal.close();
+                recipesCache = null;
+                const recipes = await fetchRecipes(currentCategory)
+                renderRecipesList(recipes)
+                await showRecipesView();
+                showToast('✅ Przepis usunięty!');
+            } catch (error) {
+                modal.close();
+                alert('Błąd: ' + error.message);
+            }
+        }
+    });
+}
+
 async function handleRemoveMeal(mealId) {
     // Get meal name for the modal
     const mealButton = document.querySelector(`[data-meal-id="${mealId}"]`);
@@ -556,8 +617,7 @@ async function showAddMealModal(mealType) {
             console.log('Modal closed');
         }
     });
-    
-    // Add search functionality
+
     setupRecipeSearch(recipesToShow, mealType);
 }
 
@@ -808,7 +868,7 @@ async function handleAddRecipeSubmit() {
         name: formData.get('name'),
         category: formData.get('category'),
         prep_time_minutes: parseInt(formData.get('prep_time_minutes')) || null,
-        servings: 1,  // Zawsze 1 porcja
+        servings: 1,
         calories_per_serving: parseFloat(formData.get('calories_per_serving')) || 0,
         protein_per_serving: parseFloat(formData.get('protein_per_serving')) || 0,
         fat_per_serving: parseFloat(formData.get('fat_per_serving')) || 0,
@@ -867,8 +927,7 @@ async function handleAddRecipeSubmit() {
         modal.close();
         showToast('✅ Przepis dodany!');
         
-        // Odśwież listę przepisów
-        recipesCache = null;  // Wyczyść cache
+        recipesCache = null;
         const recipes = await fetchRecipes(currentCategory);
         renderRecipesList(recipes);
         
@@ -1037,6 +1096,9 @@ function handleGlobalClick(e) {
             break;
         case 'remove-meal':
             handleRemoveMeal(e.target.dataset.mealId);
+            break;
+        case 'remove-recipe':
+            handleRemoveRecipe(e.target.dataset.recipeId);
             break;
         case 'prev-day':
             navigateDate(-1);

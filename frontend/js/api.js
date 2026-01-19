@@ -86,6 +86,17 @@ export async function removeMeal(mealId) {
     }
 }
 
+export async function removeRecipe(recipeId) {
+    const response = await fetch(`/api/recipes/${recipeId}`,{
+        method: 'DELETE'
+    });
+
+    if (!response.ok) {
+        throw new Error('Błąd usuwania przepisu');
+    }
+
+}
+
 /**
  * Get recipe statistics
  * @returns {Promise<number>} Total number of recipes
