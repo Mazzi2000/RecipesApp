@@ -166,3 +166,25 @@ export async function updateMealServings(mealId, servings) {
 
     return await response.json();
 }
+
+/**
+ * Create a new recipe
+ * @param {Object}
+ * @returns {Promise<Object>}
+ */
+export async function createRecipe(recipeData) {
+    const response = await fetch("/api/recipes", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(recipeData)
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Błąd tworzenia przepisu');
+    }
+
+    return await response.json();
+}

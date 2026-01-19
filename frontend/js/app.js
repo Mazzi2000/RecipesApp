@@ -5,7 +5,8 @@ import {
     removeMeal,
     getStatistics,
     fetchMealPlan,
-    updateMealServings
+    updateMealServings,
+    createRecipe
 } from './api.js';
 import modal  from './modal.js';
 
@@ -561,6 +562,324 @@ async function showAddMealModal(mealType) {
 }
 
 /**
+ * Show add recipe form in modal
+ */
+function showAddRecipeForm() {
+    const bodyHTML = `
+        <form id="add-recipe-form" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium mb-1">
+                    Nazwa przepisu *
+                </label>
+                <input 
+                    type="text" 
+                    name="name" 
+                    required
+                    class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg 
+                           focus:outline-none focus:border-blue-500"
+                    placeholder="np. Jajecznica z pomidorami"
+                />
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">
+                        Kategoria *
+                    </label>
+                    <select 
+                        name="category" 
+                        required
+                        class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg 
+                               focus:outline-none focus:border-blue-500">
+                        <option value="">Wybierz...</option>
+                        <option value="breakfast">🌅 Śniadanie</option>
+                        <option value="lunch">🍽️ Obiad</option>
+                        <option value="dinner">🌙 Kolacja</option>
+                        <option value="snack">🥨 Przekąska</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-1">
+                        Czas przygotowania (min)
+                    </label>
+                    <input 
+                        type="number" 
+                        name="prep_time_minutes"
+                        min="1"
+                        class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg 
+                               focus:outline-none focus:border-blue-500"
+                        placeholder="np. 15"
+                    />
+                </div>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium mb-2">
+                    Wartości odżywcze (na 1 porcję)
+                </label>
+                <div class="grid grid-cols-4 gap-2">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Kalorie</label>
+                        <input 
+                            type="number" 
+                            name="calories_per_serving"
+                            min="0"
+                            class="w-full px-2 py-1 bg-gray-700 border border-gray-600 rounded text-sm"
+                            placeholder="kcal"
+                        />
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Białko (g)</label>
+                        <input 
+                            type="number" 
+                            name="protein_per_serving"
+                            min="0"
+                            step="0.1"
+                            class="w-full px-2 py-1 bg-gray-700 border border-gray-600 rounded text-sm"
+                            placeholder="g"
+                        />
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Tłuszcz (g)</label>
+                        <input 
+                            type="number" 
+                            name="fat_per_serving"
+                            min="0"
+                            step="0.1"
+                            class="w-full px-2 py-1 bg-gray-700 border border-gray-600 rounded text-sm"
+                            placeholder="g"
+                        />
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Węgle (g)</label>
+                        <input 
+                            type="number" 
+                            name="carbs_per_serving"
+                            min="0"
+                            step="0.1"
+                            class="w-full px-2 py-1 bg-gray-700 border border-gray-600 rounded text-sm"
+                            placeholder="g"
+                        />
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <div class="flex justify-between items-center mb-2">
+                    <label class="block text-sm font-medium">Składniki</label>
+                    <button 
+                        type="button"
+                        id="add-ingredient-btn"
+                        class="text-sm text-blue-400 hover:text-blue-300">
+                        + Dodaj składnik
+                    </button>
+                </div>
+                <div id="ingredients-container" class="space-y-2">
+                    <!-- Składniki będą dodawane tutaj -->
+                </div>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium mb-1">
+                    Sposób przygotowania
+                </label>
+                <textarea 
+                    name="instructions"
+                    rows="4"
+                    class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg 
+                           focus:outline-none focus:border-blue-500"
+                    placeholder="Wpisz każdy krok w nowej linii..."
+                ></textarea>
+                <p class="text-xs text-gray-400 mt-1">
+                    Każda linia = jeden krok
+                </p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-1">
+                    Notatki (opcjonalne)
+                </label>
+                <textarea 
+                    name="notes"
+                    rows="2"
+                    class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg 
+                           focus:outline-none focus:border-blue-500"
+                    placeholder="Dodatkowe uwagi..."
+                ></textarea>
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">
+                    Tagi (opcjonalne)
+                </label>
+                <textarea
+                    name="tags"
+                    rows="2"
+                    class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg
+                        focus:outline-none focus:border-blue-500"
+                    placeholder="tags..."
+                    ></textarea>
+                </div>
+        </form>
+    `;
+    
+    modal.open({
+        title: '➕ Dodaj nowy przepis',
+        body: bodyHTML,
+        confirmText: 'Zapisz przepis',
+        cancelText: 'Anuluj',
+        onConfirm: handleAddRecipeSubmit
+    });
+    
+    // Setup dynamic ingredients
+    setupIngredientsForm();
+}
+
+/**
+ * Setup ingredients form functionality
+ */
+function setupIngredientsForm() {
+    const container = document.getElementById('ingredients-container');
+    const addBtn = document.getElementById('add-ingredient-btn');
+    
+    addIngredientRow(container);
+    
+    addBtn.addEventListener('click', () => {
+        addIngredientRow(container);
+    });
+}
+
+/**
+ * Add ingredient row to form
+ * @param {HTMLElement} container
+ */
+function addIngredientRow(container) {
+    const row = document.createElement('div');
+    row.className = 'flex gap-2 items-start ingredient-row';
+    
+    row.innerHTML = `
+        <input 
+            type="text" 
+            name="ingredient_name[]"
+            placeholder="Składnik"
+            class="flex-1 px-2 py-1 bg-gray-700 border border-gray-600 rounded text-sm"
+        />
+        <input 
+            type="number" 
+            name="ingredient_amount[]"
+            placeholder="Ilość"
+            min="0"
+            step="0.1"
+            class="w-20 px-2 py-1 bg-gray-700 border border-gray-600 rounded text-sm"
+        />
+        <select 
+            name="ingredient_unit[]"
+            class="w-24 px-2 py-1 bg-gray-700 border border-gray-600 rounded text-sm">
+            <option value="g">g</option>
+            <option value="ml">ml</option>
+            <option value="szt">szt</option>
+            <option value="łyżka">łyżka</option>
+            <option value="łyżeczka">łyżeczka</option>
+            <option value="szczypta">szczypta</option>
+            <option value="do_smaku">do smaku</option>
+        </select>
+        <button 
+            type="button"
+            class="text-red-400 hover:text-red-300 px-2"
+            onclick="this.closest('.ingredient-row').remove()">
+            ✕
+        </button>
+    `;
+    
+    container.appendChild(row);
+}
+
+/**
+ * Handle add recipe form submission
+ */
+async function handleAddRecipeSubmit() {
+    const form = document.getElementById('add-recipe-form');
+    
+    // Zbierz dane z formularza
+    const formData = new FormData(form);
+    
+    // Zbuduj obiekt przepisu
+    const recipeData = {
+        name: formData.get('name'),
+        category: formData.get('category'),
+        prep_time_minutes: parseInt(formData.get('prep_time_minutes')) || null,
+        servings: 1,  // Zawsze 1 porcja
+        calories_per_serving: parseFloat(formData.get('calories_per_serving')) || 0,
+        protein_per_serving: parseFloat(formData.get('protein_per_serving')) || 0,
+        fat_per_serving: parseFloat(formData.get('fat_per_serving')) || 0,
+        carbs_per_serving: parseFloat(formData.get('carbs_per_serving')) || 0,
+        notes: formData.get('notes') || null,
+        source: 'manual',
+        tags: formData.get('tags') || null,
+        ingredients: [],
+        instructions: []
+    };
+    
+    // Zbierz składniki
+    const ingredientNames = formData.getAll('ingredient_name[]');
+    const ingredientAmounts = formData.getAll('ingredient_amount[]');
+    const ingredientUnits = formData.getAll('ingredient_unit[]');
+    
+    for (let i = 0; i < ingredientNames.length; i++) {
+        if (ingredientNames[i].trim()) {  // Tylko niepuste
+            recipeData.ingredients.push({
+                name: ingredientNames[i].trim(),
+                amount: parseFloat(ingredientAmounts[i]) || 0,
+                unit: ingredientUnits[i],
+                notes: null
+            });
+        }
+    }
+    
+    // Zbierz instrukcje (każda linia = krok)
+    const instructionsText = formData.get('instructions') || '';
+    recipeData.instructions = instructionsText
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0);
+    
+    // Walidacja
+    if (!recipeData.name) {
+        alert('Nazwa przepisu jest wymagana');
+        return;
+    }
+    if (!recipeData.category) {
+        alert('Wybierz kategorię');
+        return;
+    }
+    
+    // Wyślij do API
+    try {
+        modal.container.innerHTML = `
+            <div class="p-8 text-center">
+                <div class="text-4xl mb-4">⏳</div>
+                <p>Zapisywanie przepisu...</p>
+            </div>
+        `;
+        
+        const result = await createRecipe(recipeData);
+        
+        modal.close();
+        showToast('✅ Przepis dodany!');
+        
+        // Odśwież listę przepisów
+        recipesCache = null;  // Wyczyść cache
+        const recipes = await fetchRecipes(currentCategory);
+        renderRecipesList(recipes);
+        
+    } catch (error) {
+        console.error('Error creating recipe:', error);
+        alert('Błąd: ' + error.message);
+        modal.close();
+    }
+}
+
+/**
  * Render recipe options for modal
  * @param {Array} recipes - Array of recipes
  * @returns {string} HTML string
@@ -736,6 +1055,9 @@ function handleGlobalClick(e) {
                 e.target.dataset.mealId,
                 parseFloat(e.target.dataset.currentServings) - 0.5
             );
+            break;
+        case 'show-add-recipe-form':
+            showAddRecipeForm();
             break;
     }
 }
