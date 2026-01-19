@@ -25,7 +25,7 @@ CREATE TABLE ingredients (
     amount REAL,
     unit TEXT,
     notes TEXT,
-    FOREIGN KEY (recipe_id) REFERENCES recipes(id)
+    FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON DELETE CASCADE
 );
 
 CREATE TABLE meal_plans (
@@ -34,5 +34,5 @@ CREATE TABLE meal_plans (
     meal_type TEXT NOT NULL,
     recipe_id INTEGER NOT NULL,
     servings REAL DEFAULT 1,
-    FOREIGN KEY (recipe_id) REFERENCES recipes(id)
+    FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON DELETE CASCADE
 );

@@ -121,4 +121,31 @@ def create_recipe():
     finally:
         conn.close()
 
+@recipes_bp.route("/api/recipes/<int:recipe_id>", methods=['DELETE'])
+def remove_recipe(recipe_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute('DELETE FROM ingredients WHERE recipe_id = ?', (recipe_id,))
+        cursor.execute('DELETE FROM recipes WHERE id = ?',(recipe_id,))
+
+        if (cursor.rowcount == 0):
+            return jsonify({
+                'error': 'Recipe not found'
+            }), 404
     
+        conn.commit()
+
+        return jsonify({
+            'message': 'Recipe deleted successfully'
+        })
+
+    except Exception as e:
+        conn.rollback()
+        return jsonify({
+            'error': str(e)
+        }), 500
+
+    finally:
+        conn.close()
