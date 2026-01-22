@@ -1,3 +1,5 @@
+import { t } from './i18n.js';
+
 const API_URL = '/api';
 
 /**
@@ -64,7 +66,7 @@ export async function addMealToPlan(date, mealType, recipeId, servings = 1) {
 
     if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Błąd dodawania');
+        throw new Error(error.message || t('errors.addingError'));
     }
 
     return await response.json();
@@ -82,7 +84,7 @@ export async function removeMeal(mealId) {
     });
 
     if (!response.ok) {
-        throw new Error('Błąd usuwania posiłku');
+        throw new Error(t('errors.deletingMeal'));
     }
 }
 
@@ -92,7 +94,7 @@ export async function removeRecipe(recipeId) {
     });
 
     if (!response.ok) {
-        throw new Error('Błąd usuwania przepisu');
+        throw new Error(t('errors.deletingRecipe'));
     }
 
 }
@@ -106,7 +108,7 @@ export async function getStatistics() {
     const response = await fetch(`${API_URL}/statistics`);
 
     if (!response.ok) {
-        throw new Error('Błąd pobierania statystyk');
+        throw new Error(t('errors.gettingStatistics'));
     }
 
     return await response.json();
@@ -122,7 +124,7 @@ export async function fetchMealPlan(date) {
     const response = await fetch(`/api/meal-plans?date=${date}`);
 
     if (!response.ok) {
-        throw new Error('Błąd pobierania planu posiłków');
+        throw new Error(t('errors.gettingMealPlan'));
     }
 
     return await response.json();
@@ -138,19 +140,19 @@ export async function fetchMealPlan(date) {
 export async function searchRecipes({ category = null, search = null } = {}) {
     let url = `${API_URL}/recipes`;
     const params = [];
-    
+
     if (category) params.push(`category=${category}`);
     if (search) params.push(`search=${encodeURIComponent(search)}`);
-    
+
     if (params.length > 0) {
         url += '?' + params.join('&');
     }
-    
+
     const response = await fetch(url);
     if (!response.ok) {
         throw new Error(`HTTP error! status ${response.status}`);
     }
-    
+
     return await response.json();
 }
 
@@ -172,7 +174,7 @@ export async function updateMealServings(mealId, servings) {
     });
     if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Błąd aktualizacji porcji');
+        throw new Error(error.error || t('errors.updatingServings'));
     }
 
     return await response.json();
@@ -194,7 +196,7 @@ export async function createRecipe(recipeData) {
 
     if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Błąd tworzenia przepisu');
+        throw new Error(error.error || t('errors.creatingRecipe'));
     }
 
     return await response.json();
