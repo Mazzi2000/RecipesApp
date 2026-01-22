@@ -10,13 +10,14 @@ import {
     createRecipe
 } from './api.js';
 import modal  from './modal.js';
+import { t, getLanguage, setLanguage, onLanguageChange } from './i18n.js';
 
 const CATEGORIES = [
-    { value: null, label: 'Wszystkie' },
-    { value: 'breakfast', label: '🌅 Śniadanie' },
-    { value: 'lunch', label: '🍽️ Obiad' },
-    { value: 'dinner', label: '🌙 Kolacja' },
-    { value: 'snack', label: '🥨 Przekąska' }
+    { value: null, labelKey: 'categories.all' },
+    { value: 'breakfast', labelKey: 'categories.breakfast', emoji: '🌅' },
+    { value: 'lunch', labelKey: 'categories.lunch', emoji: '🍽️' },
+    { value: 'dinner', labelKey: 'categories.dinner', emoji: '🌙' },
+    { value: 'snack', labelKey: 'categories.snack', emoji: '🥨' }
 ];
 
 // State
@@ -31,27 +32,36 @@ const filtersEl = document.getElementById('filters');
 
 // RENDER FUNCTIONS
 
-function createRecipeCard(recipe) {
-    const categoryLabels = {
-        'breakfast': 'Śniadanie',
-        'lunch': 'Obiad',
-        'dinner': 'Kolacja',
-        'snack': 'Przekąska'
-    };
+function getCategoryLabel(categoryValue) {
+    const cat = CATEGORIES.find(c => c.value === categoryValue);
+    if (cat) {
+        return cat.emoji ? `${cat.emoji} ${t(cat.labelKey)}` : t(cat.labelKey);
+    }
+    return categoryValue;
+}
 
+function getCategoryLabelNoEmoji(categoryValue) {
+    const cat = CATEGORIES.find(c => c.value === categoryValue);
+    if (cat) {
+        return t(cat.labelKey);
+    }
+    return categoryValue;
+}
+
+function createRecipeCard(recipe) {
     return `
         <article class ="bg-gray-800 rounded-lg p-4 shadow-lg hover:shadow-xl transition-shadow cursor-pointer" data-recipe-id="${recipe.id}">
 
             <h3 class="text-lg font-semibold mb-2 text-teal-500">${recipe.name}</h3>
 
             <div class="flex gap-2 mb-3">
-                <span class="text-xs bg-blue-600 px-2 py-1 rounded">${categoryLabels[recipe.category] || recipe.category}</span>
+                <span class="text-xs bg-blue-600 px-2 py-1 rounded">${getCategoryLabelNoEmoji(recipe.category)}</span>
                 <span class="text-xs bg-gray-700 px-2 py-1 rounded">⏱️ ${recipe.prep_time_minutes || '?'} min</span>
             </div>
 
             <div class="text-sm text-gray-400">
                 <span>🔥 ${recipe.calories_per_serving} kcal </span>
-                <span>💪 ${recipe.protein_per_serving}g białka </span>
+                <span>💪 ${recipe.protein_per_serving}g ${t('recipes.protein')} </span>
             </div>
         </article>
     `;
@@ -64,7 +74,7 @@ function renderRecipesList(recipes) {
     if (recipes.length === 0) {
         recipesListEl.innerHTML = `
             <p class="text-gray-500 col-span-full text-center py-8">
-                Brak przepisów w tej kategorii
+                ${t('recipes.noRecipes')}
             </p>
         `;
         return;
@@ -83,18 +93,18 @@ function renderRecipesList(recipes) {
  */
 async function renderRecipeDetail(recipe) {
     const detailHTML = createRecipeDetailHTML(recipe);
-    
+
     recipeDetailEl.innerHTML = `
         <div class="max-w-2xl mx-auto">
             <div class="flex justify-between">
                 <button data-action="back-to-list" class="mb-4 text-xl text-blue-400 cursor-pointer hover:text-blue-300">
-                    ← Powrót do listy
+                    ← ${t('recipes.backToList')}
                 </button>
                 <button
-                    data-action="remove-recipe" 
-                    data-recipe-id="${recipe.id}" 
+                    data-action="remove-recipe"
+                    data-recipe-id="${recipe.id}"
                     class="rounded-md bg-pink-500 px-2.5 py-1.5 text-sm font-semibold text-white hover:bg-pink-600 transition-colors cursor-pointer">
-                        Usuń 🗑️
+                        ${t('recipes.delete')} 🗑️
                 </button>
             </div>
 
@@ -109,16 +119,16 @@ async function showRecipeDetailInModal(recipeId) {
     try {
         // Show loading modal
         modal.open({
-            title: 'Ładowanie przepisu...',
+            title: t('recipes.loadingRecipe'),
             body: '<div class="p-8 text-center"><div class="text-4xl mb-4">⏳</div></div>'
         });
-        
+
         // Fetch recipe
         const recipe = await fetchRecipe(recipeId);
-        
+
         // Create recipe detail HTML (reuse your existing template)
         const bodyHTML = createRecipeDetailHTML(recipe);
-        
+
         // Show in modal
         modal.open({
             title: recipe.name,
@@ -127,10 +137,10 @@ async function showRecipeDetailInModal(recipeId) {
                 console.log('Recipe modal closed');
             }
         });
-        
+
     } catch (error) {
         modal.close();
-        alert('Błąd ładowania przepisu: ' + error.message);
+        alert(t('recipes.errorLoading') + ': ' + error.message);
     }
 }
 
@@ -171,31 +181,31 @@ function createRecipeDetailHTML(recipe) {
             <div class="bg-gray-800 p-3 rounded">
                 <div class="text-2xl">💪</div>
                 <div class="font-bold">${recipe.protein_per_serving}g</div>
-                <div class="text-xs text-gray-400">białko</div>
+                <div class="text-xs text-gray-400">${t('nutrition.protein')}</div>
             </div>
             <div class="bg-gray-800 p-3 rounded">
                 <div class="text-2xl">🧈</div>
                 <div class="font-bold">${recipe.fat_per_serving}g</div>
-                <div class="text-xs text-gray-400">tłuszcz</div>
+                <div class="text-xs text-gray-400">${t('nutrition.fat')}</div>
             </div>
             <div class="bg-gray-800 p-3 rounded">
                 <div class="text-2xl">🍞</div>
                 <div class="font-bold">${recipe.carbs_per_serving}g</div>
-                <div class="text-xs text-gray-400">węgle</div>
+                <div class="text-xs text-gray-400">${t('nutrition.carbs')}</div>
             </div>
         </div>
 
         <div class="mb-6">
-            <h3 class="text-lg font-semibold mb-2 text-blue-400">Składniki</h3>
+            <h3 class="text-lg font-semibold mb-2 text-blue-400">${t('recipeDetail.ingredients')}</h3>
             <ul class="bg-gray-800 rounded p-4">
                 ${ingredientsList}
             </ul>
         </div>
 
         <div class="mb-6">
-            <h3 class="text-lg font-semibold mb-2 text-blue-400">Przygotowanie</h3>
+            <h3 class="text-lg font-semibold mb-2 text-blue-400">${t('recipeDetail.instructions')}</h3>
             <ol class="bg-gray-800 rounded p-4">
-                ${instructionsList || '<li class="text-gray-500">Brak instrukcji</li>'}
+                ${instructionsList || `<li class="text-gray-500">${t('recipeDetail.noInstructions')}</li>`}
             </ol>
         </div>
     `;
@@ -208,7 +218,7 @@ function renderFilters() {
             ${cat.value === currentCategory
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-700 hover:bg-gray-600 cursor-pointer'}"
-            data-category="${cat.value}">${cat.label}
+            data-category="${cat.value}">${cat.emoji ? cat.emoji + ' ' : ''}${t(cat.labelKey)}
         </button>
     `).join('');
 
@@ -226,7 +236,7 @@ function renderFilters() {
         .then(numberOfRecipes => {
             filtersEl.insertAdjacentHTML('beforeend', `
                 <span class="ml-auto text-violet-300 font-sans font-semibold">
-                    Liczba przepisów: ${numberOfRecipes}
+                    ${t('recipes.recipeCount')}: ${numberOfRecipes}
                 </span>
             `);
         })
@@ -241,10 +251,10 @@ function renderMealPlan(plan) {
     const totals = plan.totals || {calories: 0, protein: 0, fat: 0, carbs: 0};
 
     const mealTypes = [
-        { key: 'breakfast', label: '🌅 Śniadanie' },
-        { key: 'lunch', label: '🍽️ Obiad' },
-        { key: 'dinner', label: '🌙 Kolacja' },
-        { key: 'snack', label: '🥨 Przekąska' }
+        { key: 'breakfast', labelKey: 'categories.breakfast', emoji: '🌅' },
+        { key: 'lunch', labelKey: 'categories.lunch', emoji: '🍽️' },
+        { key: 'dinner', labelKey: 'categories.dinner', emoji: '🌙' },
+        { key: 'snack', labelKey: 'categories.snack', emoji: '🥨' }
     ];
     const html = mealTypes.map(type => {
         const mealsOfType = meals.filter(m => m.meal_type === type.key);
@@ -252,15 +262,15 @@ function renderMealPlan(plan) {
         return `
             <div class="bg-gray-800 rounded-lg p-4 mb-4">
                 <div class="flex justify-between items-center mb-2">
-                    <h3 class="font-semibold">${type.label}</h3>
+                    <h3 class="font-semibold">${type.emoji} ${t(type.labelKey)}</h3>
                     <button data-action="add-meal" data-meal-type="${type.key}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer">
-                        +Dodaj
+                        +${t('mealPlan.addMeal')}
                     </button>
                 </div>
                 <div class="">
                     ${mealsOfType.length > 0
                         ? mealsOfType.map(m=> renderMealItem(m)).join('')
-                        : '<p class="text-gray-500 text-sm">Brak posiłków</p>'
+                        : `<p class="text-gray-500 text-sm">${t('mealPlan.noMeals')}</p>`
                     }
                 </div>
             </div>
@@ -300,7 +310,7 @@ function renderMealItem(meal) {
                 <span class="w-12 text-center font-semibold">
                     ${meal.servings}
                 </span>
-                <button 
+                <button
                     data-action="increase-servings"
                     data-meal-id="${meal.id}"
                     data-current-servings="${meal.servings}"
@@ -309,10 +319,10 @@ function renderMealItem(meal) {
                 </button>
             </div>
             <button
-                data-action="remove-meal" 
-                data-meal-id="${meal.id}" 
+                data-action="remove-meal"
+                data-meal-id="${meal.id}"
                 class="rounded-md bg-pink-500 px-2.5 py-1.5 text-sm font-semibold text-white hover:bg-pink-600 transition-colors">
-                    Usuń 🗑️
+                    ${t('recipes.delete')} 🗑️
             </button>
         </div>
     `;
@@ -321,7 +331,7 @@ function renderMealItem(meal) {
 function renderDailyTotals(totals) {
     document.getElementById('daily-totals').innerHTML = `
         <div class="bg-gray-800 rounded-lg p-4 mt-6">
-            <h3 class="font-semibold mb-3">📊 Podsumowanie dnia</h3>
+            <h3 class="font-semibold mb-3">📊 ${t('mealPlan.dailySummary')}</h3>
             <div class="grid grid-cols-4 gap-4 text-center">
                 <div>
                     <div class="text-2xl">🔥</div>
@@ -331,17 +341,17 @@ function renderDailyTotals(totals) {
                 <div>
                     <div class="text-2xl">💪</div>
                     <div class="font-bold text-xl">${Math.round(totals.protein)}g</div>
-                    <div class="text-xs text-gray-400">białko</div>
+                    <div class="text-xs text-gray-400">${t('nutrition.protein')}</div>
                 </div>
                 <div>
                     <div class="text-2xl">🧈</div>
                     <div class="font-bold text-xl">${Math.round(totals.fat)}g</div>
-                    <div class="text-xs text-gray-400">tłuszcz</div>
+                    <div class="text-xs text-gray-400">${t('nutrition.fat')}</div>
                 </div>
                 <div>
                     <div class="text-2xl">🍞</div>
                     <div class="font-bold text-xl">${Math.round(totals.carbs)}g</div>
-                    <div class="text-xs text-gray-400">węgle</div>
+                    <div class="text-xs text-gray-400">${t('nutrition.carbs')}</div>
                 </div>
             </div>
         </div>
@@ -376,13 +386,13 @@ async function filterByCategory(category) {
 
     renderFilters();
 
-    recipesListEl.innerHTML = '<p class="col-span-full text-center">Ładowanie...</p>';
+    recipesListEl.innerHTML = `<p class="col-span-full text-center">${t('app.loading')}</p>`;
 
     try {
         const recipes = await fetchRecipes(category);
         renderRecipesList(recipes);
     } catch (error) {
-        recipesListEl.innerHTML = `<p class="text-red-500 col-span-full text-center">Błąd: ${error.message}</p>`;
+        recipesListEl.innerHTML = `<p class="text-red-500 col-span-full text-center">${t('app.error')}: ${error.message}</p>`;
     }
 }
 
@@ -402,7 +412,7 @@ function formatDate(date) {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
-    
+
     return `${year}-${month}-${day}`;
 }
 
@@ -418,7 +428,7 @@ async function handleRemoveRecipe(recipeId) {
         return;
     }
     const recipeElement = recipeButton.closest('.flex');
-    const recipeName = recipeElement?.querySelector('span')?.textContent || 'Ten przepis';
+    const recipeName = recipeElement?.querySelector('span')?.textContent || 'This recipe';
 
     // Clean, simple body (no buttons needed!)
     const bodyHTML = `
@@ -428,35 +438,35 @@ async function handleRemoveRecipe(recipeId) {
                     <path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
             </div>
-            <h3 class="text-lg font-semibold text-white mb-2">Usunąć przepis?</h3>
-            <p class="text-sm text-gray-400">${recipeName} zostanie usunięty z bazy.</p>
+            <h3 class="text-lg font-semibold text-white mb-2">${t('deleteModal.deleteRecipeConfirm')}</h3>
+            <p class="text-sm text-gray-400">${recipeName} ${t('deleteModal.recipeWillBeDeleted')}</p>
         </div>
     `;
 
     modal.open({
-        title: 'Usuń przepis',
+        title: t('deleteModal.deleteRecipe'),
         body: bodyHTML,
-        confirmText: 'Usuń',
-        cancelText: 'Anuluj', 
-        onConfirm: async () => {    
+        confirmText: t('recipes.delete'),
+        cancelText: t('buttons.cancel'),
+        onConfirm: async () => {
             try {
                 modal.container.innerHTML = `
                     <div class="p-8 text-center">
                         <div class="text-4xl mb-4">⏳</div>
-                        <p class="text-gray-400">Usuwanie...</p>
+                        <p class="text-gray-400">${t('deleteModal.deleting')}</p>
                     </div>
                 `;
-                
+
                 await removeRecipe(recipeId);
                 modal.close();
                 recipesCache = null;
                 const recipes = await fetchRecipes(currentCategory)
                 renderRecipesList(recipes)
                 await showRecipesView();
-                showToast('✅ Przepis usunięty!');
+                showToast('✅ ' + t('toast.recipeDeleted'));
             } catch (error) {
                 modal.close();
-                alert('Błąd: ' + error.message);
+                alert(t('app.error') + ': ' + error.message);
             }
         }
     });
@@ -470,7 +480,7 @@ async function handleRemoveMeal(mealId) {
         return;
     }
     const mealElement = mealButton.closest('.flex');
-    const mealName = mealElement?.querySelector('span')?.textContent || 'Ten posiłek';
+    const mealName = mealElement?.querySelector('span')?.textContent || 'This meal';
 
     // Clean, simple body (no buttons needed!)
     const bodyHTML = `
@@ -480,33 +490,33 @@ async function handleRemoveMeal(mealId) {
                     <path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
             </div>
-            <h3 class="text-lg font-semibold text-white mb-2">Usunąć posiłek?</h3>
-            <p class="text-sm text-gray-400">${mealName} zostanie usunięty z Twojego planu.</p>
+            <h3 class="text-lg font-semibold text-white mb-2">${t('deleteModal.deleteMealConfirm')}</h3>
+            <p class="text-sm text-gray-400">${mealName} ${t('deleteModal.mealWillBeDeleted')}</p>
         </div>
     `;
 
     modal.open({
-        title: 'Usuń posiłek',
+        title: t('deleteModal.deleteMeal'),
         body: bodyHTML,
-        confirmText: 'Usuń',
-        cancelText: 'Anuluj', 
-        onConfirm: async () => {    
+        confirmText: t('recipes.delete'),
+        cancelText: t('buttons.cancel'),
+        onConfirm: async () => {
             try {
                 // Show loading
                 modal.container.innerHTML = `
                     <div class="p-8 text-center">
                         <div class="text-4xl mb-4">⏳</div>
-                        <p class="text-gray-400">Usuwanie...</p>
+                        <p class="text-gray-400">${t('deleteModal.deleting')}</p>
                     </div>
                 `;
-                
+
                 await removeMeal(mealId);
                 modal.close();
                 await loadMealPlan();
-                showToast('✅ Posiłek usunięty!');
+                showToast('✅ ' + t('toast.mealDeleted'));
             } catch (error) {
                 modal.close();
-                alert('Błąd: ' + error.message);
+                alert(t('app.error') + ': ' + error.message);
             }
         }
     });
@@ -519,7 +529,7 @@ async function handleRemoveMeal(mealId) {
 async function showRecipeDetail(recipeId){
     try {
         recipeDetailEl.classList.remove('hidden');
-        recipeDetailEl.innerHTML = '<p class="text-center">Ładowanie...</p>';
+        recipeDetailEl.innerHTML = `<p class="text-center">${t('app.loading')}</p>`;
 
         recipesListEl.classList.add('hidden');
         filtersEl.classList.add('hidden');
@@ -529,10 +539,10 @@ async function showRecipeDetail(recipeId){
         renderRecipeDetail(recipe);
     } catch (error) {
         recipeDetailEl.innerHTML = `
-            <p class="text-red-500">Błąd: ${error.message}</p>
+            <p class="text-red-500">${t('app.error')}: ${error.message}</p>
             <button data-action="back-to-list"
                 class="mt-4 bg-blue-600 px-4 py-2 rounded">
-                <- Powrót
+                <- ${t('buttons.back')}
             </button>
         `;
     }
@@ -552,7 +562,7 @@ async function loadMealPlan() {
         renderMealPlan(plan);
     } catch (error) {
         console.error('Failed to load meal plan:', error);
-        alert('Nie udało się załadować planu posiłków');
+        alert(t('errors.loadingMealPlan'));
     }
 }
 
@@ -575,33 +585,33 @@ function showPlannerView() {
  */
 async function showAddMealModal(mealType) {
     const mealTypeLabels = {
-        'breakfast': '🌅 Śniadanie',
-        'lunch': '🍽️ Obiad',
-        'dinner': '🌙 Kolacja',
-        'snack': '🥨 Przekąska'
+        'breakfast': '🌅 ' + t('categories.breakfast'),
+        'lunch': '🍽️ ' + t('categories.lunch'),
+        'dinner': '🌙 ' + t('categories.dinner'),
+        'snack': '🥨 ' + t('categories.snack')
     };
-    
+
     // Load recipes if not cached
     if (!recipesCache) {
         try {
             recipesCache = await fetchRecipes();
         } catch (error) {
-            alert('Błąd ładowania przepisów');
+            alert(t('errors.loadingRecipes'));
             return;
         }
     }
-    
+
     // Filter recipes by meal type (optional)
     const filteredRecipes = recipesCache.filter(r => r.category === mealType);
     const recipesToShow = filteredRecipes.length > 0 ? filteredRecipes : recipesCache;
-    
+
     // Create modal body
     const bodyHTML = `
         <div class="mb-4">
-            <input 
-                type="text" 
-                id="recipe-search" 
-                placeholder="Szukaj przepisu..."
+            <input
+                type="text"
+                id="recipe-search"
+                placeholder="${t('recipes.searchPlaceholder')}"
                 class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500"
             />
         </div>
@@ -609,9 +619,9 @@ async function showAddMealModal(mealType) {
             ${renderRecipeOptions(recipesToShow)}
         </div>
     `;
-    
+
     modal.open({
-        title: `Dodaj posiłek: ${mealTypeLabels[mealType]}`,
+        title: `${t('mealPlan.addMealTo')}: ${mealTypeLabels[mealType]}`,
         body: bodyHTML,
         onClose: () => {
             console.log('Modal closed');
@@ -629,60 +639,60 @@ function showAddRecipeForm() {
         <form id="add-recipe-form" class="space-y-4">
             <div>
                 <label class="block text-sm font-medium mb-1">
-                    Nazwa przepisu *
+                    ${t('addRecipeForm.recipeName')} *
                 </label>
-                <input 
-                    type="text" 
-                    name="name" 
+                <input
+                    type="text"
+                    name="name"
                     required
-                    class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg 
+                    class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg
                            focus:outline-none focus:border-blue-500"
-                    placeholder="np. Jajecznica z pomidorami"
+                    placeholder="${t('addRecipeForm.recipeNamePlaceholder')}"
                 />
             </div>
-            
+
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium mb-1">
-                        Kategoria *
+                        ${t('addRecipeForm.category')} *
                     </label>
-                    <select 
-                        name="category" 
+                    <select
+                        name="category"
                         required
-                        class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg 
+                        class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg
                                focus:outline-none focus:border-blue-500">
-                        <option value="">Wybierz...</option>
-                        <option value="breakfast">🌅 Śniadanie</option>
-                        <option value="lunch">🍽️ Obiad</option>
-                        <option value="dinner">🌙 Kolacja</option>
-                        <option value="snack">🥨 Przekąska</option>
+                        <option value="">${t('addRecipeForm.chooseCategory')}</option>
+                        <option value="breakfast">🌅 ${t('categories.breakfast')}</option>
+                        <option value="lunch">🍽️ ${t('categories.lunch')}</option>
+                        <option value="dinner">🌙 ${t('categories.dinner')}</option>
+                        <option value="snack">🥨 ${t('categories.snack')}</option>
                     </select>
                 </div>
-                
+
                 <div>
                     <label class="block text-sm font-medium mb-1">
-                        Czas przygotowania (min)
+                        ${t('addRecipeForm.prepTime')}
                     </label>
-                    <input 
-                        type="number" 
+                    <input
+                        type="number"
                         name="prep_time_minutes"
                         min="1"
-                        class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg 
+                        class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg
                                focus:outline-none focus:border-blue-500"
-                        placeholder="np. 15"
+                        placeholder="${t('addRecipeForm.prepTimePlaceholder')}"
                     />
                 </div>
             </div>
-            
+
             <div>
                 <label class="block text-sm font-medium mb-2">
-                    Wartości odżywcze (na 1 porcję)
+                    ${t('addRecipeForm.nutritionPerServing')}
                 </label>
                 <div class="grid grid-cols-4 gap-2">
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1">Kalorie</label>
-                        <input 
-                            type="number" 
+                        <label class="block text-xs text-gray-400 mb-1">${t('addRecipeForm.calories')}</label>
+                        <input
+                            type="number"
                             name="calories_per_serving"
                             min="0"
                             class="w-full px-2 py-1 bg-gray-700 border border-gray-600 rounded text-sm"
@@ -690,9 +700,9 @@ function showAddRecipeForm() {
                         />
                     </div>
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1">Białko (g)</label>
-                        <input 
-                            type="number" 
+                        <label class="block text-xs text-gray-400 mb-1">${t('addRecipeForm.proteinG')}</label>
+                        <input
+                            type="number"
                             name="protein_per_serving"
                             min="0"
                             step="0.1"
@@ -701,9 +711,9 @@ function showAddRecipeForm() {
                         />
                     </div>
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1">Tłuszcz (g)</label>
-                        <input 
-                            type="number" 
+                        <label class="block text-xs text-gray-400 mb-1">${t('addRecipeForm.fatG')}</label>
+                        <input
+                            type="number"
                             name="fat_per_serving"
                             min="0"
                             step="0.1"
@@ -712,9 +722,9 @@ function showAddRecipeForm() {
                         />
                     </div>
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1">Węgle (g)</label>
-                        <input 
-                            type="number" 
+                        <label class="block text-xs text-gray-400 mb-1">${t('addRecipeForm.carbsG')}</label>
+                        <input
+                            type="number"
                             name="carbs_per_serving"
                             min="0"
                             step="0.1"
@@ -724,53 +734,53 @@ function showAddRecipeForm() {
                     </div>
                 </div>
             </div>
-            
+
             <div>
                 <div class="flex justify-between items-center mb-2">
-                    <label class="block text-sm font-medium">Składniki</label>
-                    <button 
+                    <label class="block text-sm font-medium">${t('addRecipeForm.ingredients')}</label>
+                    <button
                         type="button"
                         id="add-ingredient-btn"
                         class="text-sm text-blue-400 hover:text-blue-300">
-                        + Dodaj składnik
+                        + ${t('addRecipeForm.addIngredient')}
                     </button>
                 </div>
                 <div id="ingredients-container" class="space-y-2">
-                    <!-- Składniki będą dodawane tutaj -->
+                    <!-- Ingredients will be added here -->
                 </div>
             </div>
-            
+
             <div>
                 <label class="block text-sm font-medium mb-1">
-                    Sposób przygotowania
+                    ${t('addRecipeForm.instructions')}
                 </label>
-                <textarea 
+                <textarea
                     name="instructions"
                     rows="4"
-                    class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg 
+                    class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg
                            focus:outline-none focus:border-blue-500"
-                    placeholder="Wpisz każdy krok w nowej linii..."
+                    placeholder="${t('addRecipeForm.instructionsPlaceholder')}"
                 ></textarea>
                 <p class="text-xs text-gray-400 mt-1">
-                    Każda linia = jeden krok
+                    ${t('addRecipeForm.instructionsHint')}
                 </p>
             </div>
 
             <div>
                 <label class="block text-sm font-medium mb-1">
-                    Notatki (opcjonalne)
+                    ${t('addRecipeForm.notes')}
                 </label>
-                <textarea 
+                <textarea
                     name="notes"
                     rows="2"
-                    class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg 
+                    class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg
                            focus:outline-none focus:border-blue-500"
-                    placeholder="Dodatkowe uwagi..."
+                    placeholder="${t('addRecipeForm.notesPlaceholder')}"
                 ></textarea>
             </div>
             <div>
                 <label class="block text-sm font-medium mb-1">
-                    Tagi (opcjonalne)
+                    ${t('addRecipeForm.tags')}
                 </label>
                 <textarea
                     name="tags"
@@ -782,15 +792,15 @@ function showAddRecipeForm() {
                 </div>
         </form>
     `;
-    
+
     modal.open({
-        title: '➕ Dodaj nowy przepis',
+        title: '➕ ' + t('addRecipeForm.title'),
         body: bodyHTML,
-        confirmText: 'Zapisz przepis',
-        cancelText: 'Anuluj',
+        confirmText: t('addRecipeForm.saveRecipe'),
+        cancelText: t('buttons.cancel'),
         onConfirm: handleAddRecipeSubmit
     });
-    
+
     // Setup dynamic ingredients
     setupIngredientsForm();
 }
@@ -801,9 +811,9 @@ function showAddRecipeForm() {
 function setupIngredientsForm() {
     const container = document.getElementById('ingredients-container');
     const addBtn = document.getElementById('add-ingredient-btn');
-    
+
     addIngredientRow(container);
-    
+
     addBtn.addEventListener('click', () => {
         addIngredientRow(container);
     });
@@ -816,41 +826,41 @@ function setupIngredientsForm() {
 function addIngredientRow(container) {
     const row = document.createElement('div');
     row.className = 'flex gap-2 items-start ingredient-row';
-    
+
     row.innerHTML = `
-        <input 
-            type="text" 
+        <input
+            type="text"
             name="ingredient_name[]"
-            placeholder="Składnik"
+            placeholder="${t('addRecipeForm.ingredientPlaceholder')}"
             class="flex-1 px-2 py-1 bg-gray-700 border border-gray-600 rounded text-sm"
         />
-        <input 
-            type="number" 
+        <input
+            type="number"
             name="ingredient_amount[]"
-            placeholder="Ilość"
+            placeholder="${t('addRecipeForm.amountPlaceholder')}"
             min="0"
             step="0.1"
             class="w-20 px-2 py-1 bg-gray-700 border border-gray-600 rounded text-sm"
         />
-        <select 
+        <select
             name="ingredient_unit[]"
             class="w-24 px-2 py-1 bg-gray-700 border border-gray-600 rounded text-sm">
-            <option value="g">g</option>
-            <option value="ml">ml</option>
-            <option value="szt">szt</option>
-            <option value="łyżka">łyżka</option>
-            <option value="łyżeczka">łyżeczka</option>
-            <option value="szczypta">szczypta</option>
-            <option value="do_smaku">do smaku</option>
+            <option value="g">${t('units.g')}</option>
+            <option value="ml">${t('units.ml')}</option>
+            <option value="szt">${t('units.pcs')}</option>
+            <option value="łyżka">${t('units.tbsp')}</option>
+            <option value="łyżeczka">${t('units.tsp')}</option>
+            <option value="szczypta">${t('units.pinch')}</option>
+            <option value="do_smaku">${t('units.toTaste')}</option>
         </select>
-        <button 
+        <button
             type="button"
             class="text-red-400 hover:text-red-300 px-2"
             onclick="this.closest('.ingredient-row').remove()">
             ✕
         </button>
     `;
-    
+
     container.appendChild(row);
 }
 
@@ -859,11 +869,11 @@ function addIngredientRow(container) {
  */
 async function handleAddRecipeSubmit() {
     const form = document.getElementById('add-recipe-form');
-    
-    // Zbierz dane z formularza
+
+    // Collect form data
     const formData = new FormData(form);
-    
-    // Zbuduj obiekt przepisu
+
+    // Build recipe object
     const recipeData = {
         name: formData.get('name'),
         category: formData.get('category'),
@@ -879,14 +889,14 @@ async function handleAddRecipeSubmit() {
         ingredients: [],
         instructions: []
     };
-    
-    // Zbierz składniki
+
+    // Collect ingredients
     const ingredientNames = formData.getAll('ingredient_name[]');
     const ingredientAmounts = formData.getAll('ingredient_amount[]');
     const ingredientUnits = formData.getAll('ingredient_unit[]');
-    
+
     for (let i = 0; i < ingredientNames.length; i++) {
-        if (ingredientNames[i].trim()) {  // Tylko niepuste
+        if (ingredientNames[i].trim()) {  // Only non-empty
             recipeData.ingredients.push({
                 name: ingredientNames[i].trim(),
                 amount: parseFloat(ingredientAmounts[i]) || 0,
@@ -895,45 +905,45 @@ async function handleAddRecipeSubmit() {
             });
         }
     }
-    
-    // Zbierz instrukcje (każda linia = krok)
+
+    // Collect instructions (each line = step)
     const instructionsText = formData.get('instructions') || '';
     recipeData.instructions = instructionsText
         .split('\n')
         .map(line => line.trim())
         .filter(line => line.length > 0);
-    
-    // Walidacja
+
+    // Validation
     if (!recipeData.name) {
-        alert('Nazwa przepisu jest wymagana');
+        alert(t('addRecipeForm.nameRequired'));
         return;
     }
     if (!recipeData.category) {
-        alert('Wybierz kategorię');
+        alert(t('addRecipeForm.categoryRequired'));
         return;
     }
-    
-    // Wyślij do API
+
+    // Send to API
     try {
         modal.container.innerHTML = `
             <div class="p-8 text-center">
                 <div class="text-4xl mb-4">⏳</div>
-                <p>Zapisywanie przepisu...</p>
+                <p>${t('addRecipeForm.savingRecipe')}</p>
             </div>
         `;
-        
+
         const result = await createRecipe(recipeData);
-        
+
         modal.close();
-        showToast('✅ Przepis dodany!');
-        
+        showToast('✅ ' + t('toast.recipeAdded'));
+
         recipesCache = null;
         const recipes = await fetchRecipes(currentCategory);
         renderRecipesList(recipes);
-        
+
     } catch (error) {
         console.error('Error creating recipe:', error);
-        alert('Błąd: ' + error.message);
+        alert(t('app.error') + ': ' + error.message);
         modal.close();
     }
 }
@@ -945,19 +955,19 @@ async function handleAddRecipeSubmit() {
  */
 function renderRecipeOptions(recipes) {
     if (recipes.length === 0) {
-        return '<p class="text-gray-400 text-center py-4">Brak przepisów</p>';
+        return `<p class="text-gray-400 text-center py-4">${t('recipes.noRecipesFound')}</p>`;
     }
-    
+
     return recipes.map(recipe => `
-        <button 
+        <button
             class="recipe-option w-full text-left p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors flex justify-between items-center"
             data-recipe-id="${recipe.id}"
         >
             <div>
                 <div class="font-semibold text-teal-400">${recipe.name}</div>
                 <div class="text-sm text-gray-400">
-                    🔥 ${recipe.calories_per_serving} kcal | 
-                    💪 ${recipe.protein_per_serving}g białka
+                    🔥 ${recipe.calories_per_serving} kcal |
+                    💪 ${recipe.protein_per_serving}g ${t('recipes.protein')}
                 </div>
             </div>
             <div class="text-2xl">→</div>
@@ -973,17 +983,17 @@ function renderRecipeOptions(recipes) {
 function setupRecipeSearch(recipes, mealType) {
     const searchInput = document.getElementById('recipe-search');
     const recipeList = document.getElementById('recipe-list');
-    
+
     // Search handler
     searchInput.addEventListener('input', (e) => {
         const searchTerm = e.target.value.toLowerCase();
-        const filtered = recipes.filter(recipe => 
+        const filtered = recipes.filter(recipe =>
             recipe.name.toLowerCase().includes(searchTerm)
         );
         recipeList.innerHTML = renderRecipeOptions(filtered);
         attachRecipeClickHandlers(mealType);
     });
-    
+
     // Attach click handlers
     attachRecipeClickHandlers(mealType);
 }
@@ -1013,25 +1023,25 @@ async function handleAddMeal(mealType, recipeId) {
         modal.container.innerHTML = `
             <div class="p-8 text-center">
                 <div class="text-4xl mb-4">⏳</div>
-                <p>Dodawanie posiłku...</p>
+                <p>${t('app.loading')}</p>
             </div>
         `;
-        
+
         // Add meal to plan
         await addMealToPlan(formatDate(currentDate), mealType, recipeId, 1);
-        
+
         // Close modal
         modal.close();
-        
+
         // Reload meal plan
         await loadMealPlan();
-        
+
         // Show success message (optional)
-        showToast('✅ Posiłek dodany do planu!');
-        
+        showToast('✅ ' + t('toast.mealAdded'));
+
     } catch (error) {
         console.error('Error adding meal:', error);
-        alert('Błąd dodawania posiłku: ' + error.message);
+        alert(t('errors.addingMeal') + ': ' + error.message);
         modal.close();
     }
 }
@@ -1053,7 +1063,7 @@ async function handleServingsChange(mealId, newServings){
 
     } catch (error) {
         console.error('Error updating servings:', error);
-        showToast('❌ Błąd zmiany porcji');       
+        showToast('❌ ' + t('toast.servingsError'));
     }
 }
 
@@ -1065,9 +1075,9 @@ function showToast(message) {
     const toast = document.createElement('div');
     toast.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in';
     toast.textContent = message;
-    
+
     document.body.appendChild(toast);
-    
+
     setTimeout(() => {
         toast.classList.add('animate-fade-out');
         setTimeout(() => document.body.removeChild(toast), 300);
@@ -1121,12 +1131,70 @@ function handleGlobalClick(e) {
         case 'show-add-recipe-form':
             showAddRecipeForm();
             break;
+        case 'set-language':
+            setLanguage(e.target.dataset.lang);
+            break;
+    }
+}
+
+/**
+ * Update all static UI elements with translations
+ */
+function updateStaticUI() {
+    // Update header title
+    document.getElementById('app-title').textContent = t('app.title');
+
+    // Update navigation buttons
+    document.getElementById('nav-recipes-btn').innerHTML = '📖 ' + t('nav.recipes');
+    document.getElementById('nav-planner-btn').innerHTML = '📅 ' + t('nav.mealPlanner');
+
+    // Update add recipe button
+    document.getElementById('add-recipe-btn').innerHTML = '➕ ' + t('nav.addRecipe');
+
+    // Update language switcher active state
+    const langButtons = document.querySelectorAll('[data-action="set-language"]');
+    const currentLang = getLanguage();
+    langButtons.forEach(btn => {
+        if (btn.dataset.lang === currentLang) {
+            btn.classList.add('bg-blue-600', 'text-white');
+            btn.classList.remove('bg-gray-700', 'text-gray-300');
+        } else {
+            btn.classList.remove('bg-blue-600', 'text-white');
+            btn.classList.add('bg-gray-700', 'text-gray-300');
+        }
+    });
+}
+
+/**
+ * Handle language change - re-render all dynamic content
+ */
+function handleLanguageChange() {
+    updateStaticUI();
+    renderFilters();
+
+    // Re-render meal plan if visible
+    if (!document.getElementById('planner-view').classList.contains('hidden')) {
+        loadMealPlan();
+    }
+
+    // Re-render recipes list if visible
+    if (!document.getElementById('recipes-view').classList.contains('hidden') && recipesCache) {
+        const filteredRecipes = currentCategory
+            ? recipesCache.filter(r => r.category === currentCategory)
+            : recipesCache;
+        renderRecipesList(filteredRecipes);
     }
 }
 
 // INITIALIZATION
 
 async function init() {
+    // Subscribe to language changes
+    onLanguageChange(handleLanguageChange);
+
+    // Update static UI elements
+    updateStaticUI();
+
     renderFilters();
 
     // One global click handler for all actions
@@ -1134,9 +1202,10 @@ async function init() {
 
     try {
         const recipes = await fetchRecipes();
+        recipesCache = recipes;
         renderRecipesList(recipes);
     } catch (error){
-        recipesListEl.innerHTML = `<p class="text-red-500 col-span-full text-center py-8">Błąd ładowania: ${error.message}</p>`;
+        recipesListEl.innerHTML = `<p class="text-red-500 col-span-full text-center py-8">${t('errors.loadingRecipes')}: ${error.message}</p>`;
     }
 }
 

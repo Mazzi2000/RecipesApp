@@ -1,0 +1,118 @@
+{
+  "app": {
+    "title": "Natalia's Recipes",
+    "loading": "Loading...",
+    "error": "Error"
+  },
+  "nav": {
+    "recipes": "Recipes",
+    "mealPlanner": "Meal Planner",
+    "addRecipe": "Add recipe"
+  },
+  "categories": {
+    "all": "All",
+    "breakfast": "Breakfast",
+    "lunch": "Lunch",
+    "dinner": "Dinner",
+    "snack": "Snack"
+  },
+  "recipes": {
+    "noRecipes": "No recipes in this category",
+    "noRecipesFound": "No recipes",
+    "recipeCount": "Number of recipes",
+    "backToList": "Back to list",
+    "delete": "Delete",
+    "loadingRecipe": "Loading recipe...",
+    "errorLoading": "Error loading recipe",
+    "searchPlaceholder": "Search for recipe...",
+    "protein": "protein"
+  },
+  "nutrition": {
+    "kcal": "kcal",
+    "protein": "protein",
+    "fat": "fat",
+    "carbs": "carbs"
+  },
+  "recipeDetail": {
+    "ingredients": "Ingredients",
+    "instructions": "Instructions",
+    "noInstructions": "No instructions",
+    "nutritionPerServing": "Nutritional values (per 1 serving)"
+  },
+  "mealPlan": {
+    "noMeals": "No meals",
+    "addMeal": "Add",
+    "dailySummary": "Daily summary",
+    "addMealTo": "Add meal"
+  },
+  "deleteModal": {
+    "deleteRecipe": "Delete recipe",
+    "deleteRecipeConfirm": "Delete recipe?",
+    "recipeWillBeDeleted": "will be deleted from the database.",
+    "deleteMeal": "Delete meal",
+    "deleteMealConfirm": "Delete meal?",
+    "mealWillBeDeleted": "will be deleted from your plan.",
+    "deleting": "Deleting..."
+  },
+  "toast": {
+    "recipeDeleted": "Recipe deleted!",
+    "mealDeleted": "Meal deleted!",
+    "mealAdded": "Meal added to plan!",
+    "recipeAdded": "Recipe added!",
+    "servingsError": "Error changing servings"
+  },
+  "addRecipeForm": {
+    "title": "Add new recipe",
+    "recipeName": "Recipe name",
+    "recipeNamePlaceholder": "e.g. Scrambled eggs with tomatoes",
+    "category": "Category",
+    "chooseCategory": "Choose...",
+    "prepTime": "Preparation time (min)",
+    "prepTimePlaceholder": "e.g. 15",
+    "nutritionPerServing": "Nutritional values (per 1 serving)",
+    "calories": "Calories",
+    "proteinG": "Protein (g)",
+    "fatG": "Fat (g)",
+    "carbsG": "Carbs (g)",
+    "ingredients": "Ingredients",
+    "addIngredient": "Add ingredient",
+    "ingredientPlaceholder": "Ingredient",
+    "amountPlaceholder": "Amount",
+    "instructions": "Preparation method",
+    "instructionsPlaceholder": "Type each step on a new line...",
+    "instructionsHint": "Each line = one step",
+    "notes": "Notes (optional)",
+    "notesPlaceholder": "Additional notes...",
+    "tags": "Tags (optional)",
+    "saveRecipe": "Save recipe",
+    "savingRecipe": "Saving recipe...",
+    "nameRequired": "Recipe name is required",
+    "categoryRequired": "Select a category"
+  },
+  "units": {
+    "g": "g",
+    "ml": "ml",
+    "pcs": "pcs",
+    "tbsp": "tbsp",
+    "tsp": "tsp",
+    "pinch": "pinch",
+    "toTaste": "to taste"
+  },
+  "buttons": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "back": "Back"
+  },
+  "errors": {
+    "addingMeal": "Error adding meal",
+    "addingError": "Error adding",
+    "deletingMeal": "Error deleting meal",
+    "deletingRecipe": "Error deleting recipe",
+    "gettingStatistics": "Error getting statistics",
+    "gettingMealPlan": "Error getting meal plan",
+    "updatingServings": "Error updating servings",
+    "creatingRecipe": "Error creating recipe",
+    "loadingRecipes": "Error loading recipes",
+    "loadingMealPlan": "Failed to load meal plan"
+  }
+}

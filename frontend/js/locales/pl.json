@@ -1,0 +1,118 @@
+{
+  "app": {
+    "title": "Przepisy Natalii",
+    "loading": "Ładowanie...",
+    "error": "Błąd"
+  },
+  "nav": {
+    "recipes": "Przepisy",
+    "mealPlanner": "Meal Planner",
+    "addRecipe": "Dodaj przepis"
+  },
+  "categories": {
+    "all": "Wszystkie",
+    "breakfast": "Śniadanie",
+    "lunch": "Obiad",
+    "dinner": "Kolacja",
+    "snack": "Przekąska"
+  },
+  "recipes": {
+    "noRecipes": "Brak przepisów w tej kategorii",
+    "noRecipesFound": "Brak przepisów",
+    "recipeCount": "Liczba przepisów",
+    "backToList": "Powrót do listy",
+    "delete": "Usuń",
+    "loadingRecipe": "Ładowanie przepisu...",
+    "errorLoading": "Błąd ładowania przepisu",
+    "searchPlaceholder": "Szukaj przepisu...",
+    "protein": "białka"
+  },
+  "nutrition": {
+    "kcal": "kcal",
+    "protein": "białko",
+    "fat": "tłuszcz",
+    "carbs": "węgle"
+  },
+  "recipeDetail": {
+    "ingredients": "Składniki",
+    "instructions": "Przygotowanie",
+    "noInstructions": "Brak instrukcji",
+    "nutritionPerServing": "Wartości odżywcze (na 1 porcję)"
+  },
+  "mealPlan": {
+    "noMeals": "Brak posiłków",
+    "addMeal": "Dodaj",
+    "dailySummary": "Podsumowanie dnia",
+    "addMealTo": "Dodaj posiłek"
+  },
+  "deleteModal": {
+    "deleteRecipe": "Usuń przepis",
+    "deleteRecipeConfirm": "Usunąć przepis?",
+    "recipeWillBeDeleted": "zostanie usunięty z bazy.",
+    "deleteMeal": "Usuń posiłek",
+    "deleteMealConfirm": "Usunąć posiłek?",
+    "mealWillBeDeleted": "zostanie usunięty z Twojego planu.",
+    "deleting": "Usuwanie..."
+  },
+  "toast": {
+    "recipeDeleted": "Przepis usunięty!",
+    "mealDeleted": "Posiłek usunięty!",
+    "mealAdded": "Posiłek dodany do planu!",
+    "recipeAdded": "Przepis dodany!",
+    "servingsError": "Błąd zmiany porcji"
+  },
+  "addRecipeForm": {
+    "title": "Dodaj nowy przepis",
+    "recipeName": "Nazwa przepisu",
+    "recipeNamePlaceholder": "np. Jajecznica z pomidorami",
+    "category": "Kategoria",
+    "chooseCategory": "Wybierz...",
+    "prepTime": "Czas przygotowania (min)",
+    "prepTimePlaceholder": "np. 15",
+    "nutritionPerServing": "Wartości odżywcze (na 1 porcję)",
+    "calories": "Kalorie",
+    "proteinG": "Białko (g)",
+    "fatG": "Tłuszcz (g)",
+    "carbsG": "Węgle (g)",
+    "ingredients": "Składniki",
+    "addIngredient": "Dodaj składnik",
+    "ingredientPlaceholder": "Składnik",
+    "amountPlaceholder": "Ilość",
+    "instructions": "Sposób przygotowania",
+    "instructionsPlaceholder": "Wpisz każdy krok w nowej linii...",
+    "instructionsHint": "Każda linia = jeden krok",
+    "notes": "Notatki (opcjonalne)",
+    "notesPlaceholder": "Dodatkowe uwagi...",
+    "tags": "Tagi (opcjonalne)",
+    "saveRecipe": "Zapisz przepis",
+    "savingRecipe": "Zapisywanie przepisu...",
+    "nameRequired": "Nazwa przepisu jest wymagana",
+    "categoryRequired": "Wybierz kategorię"
+  },
+  "units": {
+    "g": "g",
+    "ml": "ml",
+    "pcs": "szt",
+    "tbsp": "łyżka",
+    "tsp": "łyżeczka",
+    "pinch": "szczypta",
+    "toTaste": "do smaku"
+  },
+  "buttons": {
+    "cancel": "Anuluj",
+    "confirm": "Potwierdź",
+    "back": "Powrót"
+  },
+  "errors": {
+    "addingMeal": "Błąd dodawania posiłku",
+    "addingError": "Błąd dodawania",
+    "deletingMeal": "Błąd usuwania posiłku",
+    "deletingRecipe": "Błąd usuwania przepisu",
+    "gettingStatistics": "Błąd pobierania statystyk",
+    "gettingMealPlan": "Błąd pobierania planu posiłków",
+    "updatingServings": "Błąd aktualizacji porcji",
+    "creatingRecipe": "Błąd tworzenia przepisu",
+    "loadingRecipes": "Błąd ładowania",
+    "loadingMealPlan": "Nie udało się załadować planu posiłków"
+  }
+}
