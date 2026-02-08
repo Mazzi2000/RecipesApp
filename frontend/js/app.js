@@ -7,7 +7,10 @@ import {
     getStatistics,
     fetchMealPlan,
     updateMealServings,
-    createRecipe
+    createRecipe,
+    checkAuth,
+    login,
+    logout
 } from './api.js';
 import modal  from './modal.js';
 import { t, getLanguage, setLanguage, onLanguageChange } from './i18n.js';
@@ -24,6 +27,8 @@ const CATEGORIES = [
 let currentDate = new Date();
 let currentCategory = null;
 let recipesCache = null;
+let isAuthenticated = false;
+let currentUser = null;
 
 // DOM REFERENCES
 const recipesListEl = document.getElementById('recipes-list');
@@ -100,12 +105,14 @@ async function renderRecipeDetail(recipe) {
                 <button data-action="back-to-list" class="mb-4 text-xl text-blue-400 cursor-pointer hover:text-blue-300">
                     ← ${t('recipes.backToList')}
                 </button>
+                ${isAuthenticated ? `
                 <button
                     data-action="remove-recipe"
                     data-recipe-id="${recipe.id}"
                     class="rounded-md bg-pink-500 px-2.5 py-1.5 text-sm font-semibold text-white hover:bg-pink-600 transition-colors cursor-pointer">
                         ${t('recipes.delete')} 🗑️
                 </button>
+                ` : ''}
             </div>
 
             <h2 class="text-2xl font-bold text-orange-300 mb-4">${recipe.name}</h2>
@@ -1091,6 +1098,164 @@ function showToast(message) {
     }, 3000);
 }
 
+// AUTH UI
+
+/**
+ * Check auth status and update UI accordingly
+ */
+async function refreshAuthState() {
+    try {
+        const data = await checkAuth();
+        isAuthenticated = data.authenticated;
+        currentUser = data.authenticated ? data.user : null;
+    } catch (error) {
+        console.error('Auth check failed:', error);
+        isAuthenticated = false;
+        currentUser = null;
+    }
+    updateAuthUI();
+}
+
+/**
+ * Update header auth area and toggle protected UI elements
+ */
+function updateAuthUI() {
+    const authArea = document.getElementById('auth-area');
+    const addRecipeBtn = document.getElementById('add-recipe-btn');
+    const navPlannerBtn = document.getElementById('nav-planner-btn');
+
+    if (isAuthenticated && currentUser) {
+        authArea.innerHTML = `
+            <span class="text-sm text-gray-300">${t('auth.loggedInAs')} <strong>${currentUser.username}</strong></span>
+            <button
+                data-action="do-logout"
+                id="logout-btn"
+                class="bg-gray-600 hover:bg-gray-500 text-white font-semibold px-4 py-1.5 rounded transition-colors cursor-pointer text-sm">
+                ${t('auth.logout')}
+            </button>
+        `;
+        addRecipeBtn.classList.remove('hidden');
+        navPlannerBtn.classList.remove('hidden');
+    } else {
+        authArea.innerHTML = `
+            <button
+                data-action="show-login"
+                id="login-btn"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-1.5 rounded transition-colors cursor-pointer text-sm">
+                ${t('auth.login')}
+            </button>
+        `;
+        addRecipeBtn.classList.add('hidden');
+        navPlannerBtn.classList.add('hidden');
+
+        // If planner view is showing, switch back to recipes
+        if (!document.getElementById('planner-view').classList.contains('hidden')) {
+            showRecipesView();
+        }
+    }
+}
+
+/**
+ * Show the login modal
+ */
+function showLoginModal() {
+    const bodyHTML = `
+        <form id="login-form" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium mb-1">${t('auth.username')}</label>
+                <input
+                    type="text"
+                    id="login-username"
+                    required
+                    class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500"
+                    placeholder="${t('auth.usernamePlaceholder')}"
+                />
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">${t('auth.password')}</label>
+                <input
+                    type="password"
+                    id="login-password"
+                    required
+                    class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-blue-500"
+                    placeholder="${t('auth.passwordPlaceholder')}"
+                />
+            </div>
+            <div id="login-error" class="hidden text-red-400 text-sm"></div>
+        </form>
+    `;
+
+    modal.open({
+        title: t('auth.loginTitle'),
+        body: bodyHTML,
+        confirmText: t('auth.login'),
+        cancelText: t('buttons.cancel'),
+        onConfirm: handleLoginSubmit
+    });
+}
+
+/**
+ * Handle login form submission
+ */
+async function handleLoginSubmit() {
+    const username = document.getElementById('login-username').value.trim();
+    const password = document.getElementById('login-password').value;
+    const errorEl = document.getElementById('login-error');
+
+    if (!username || !password) {
+        errorEl.textContent = t('auth.loginRequired');
+        errorEl.classList.remove('hidden');
+        return;
+    }
+
+    // Show loading state
+    modal.container.innerHTML = `
+        <div class="p-8 text-center">
+            <div class="text-4xl mb-4">⏳</div>
+            <p>${t('auth.loggingIn')}</p>
+        </div>
+    `;
+
+    try {
+        await login(username, password);
+        modal.close();
+        await refreshAuthState();
+        recipesCache = null;
+        const recipes = await fetchRecipes(currentCategory);
+        recipesCache = recipes;
+        renderRecipesList(recipes);
+        showToast('✅ ' + t('auth.login') + '!');
+    } catch (error) {
+        // Re-show form with error
+        showLoginModal();
+        // Wait a tick for the DOM to update
+        setTimeout(() => {
+            const err = document.getElementById('login-error');
+            if (err) {
+                err.textContent = error.message;
+                err.classList.remove('hidden');
+            }
+        }, 50);
+    }
+}
+
+/**
+ * Handle logout
+ */
+async function handleLogout() {
+    try {
+        await logout();
+        await refreshAuthState();
+        recipesCache = null;
+        const recipes = await fetchRecipes(currentCategory);
+        recipesCache = recipes;
+        renderRecipesList(recipes);
+    } catch (error) {
+        console.error('Logout failed:', error);
+        showToast('❌ ' + error.message);
+    }
+}
+
 // GLOBAL EVENT DELEGATION
 
 function handleGlobalClick(e) {
@@ -1141,6 +1306,12 @@ function handleGlobalClick(e) {
         case 'set-language':
             setLanguage(e.target.dataset.lang);
             break;
+        case 'show-login':
+            showLoginModal();
+            break;
+        case 'do-logout':
+            handleLogout();
+            break;
     }
 }
 
@@ -1170,6 +1341,9 @@ function updateStaticUI() {
             btn.classList.add('bg-gray-700', 'text-gray-300');
         }
     });
+
+    // Update auth UI labels
+    updateAuthUI();
 }
 
 /**
@@ -1198,6 +1372,9 @@ function handleLanguageChange() {
 async function init() {
     // Subscribe to language changes
     onLanguageChange(handleLanguageChange);
+
+    // Check auth status first
+    await refreshAuthState();
 
     // Update static UI elements
     updateStaticUI();
