@@ -1,10 +1,12 @@
 from flask import jsonify, Blueprint, request
+from flask_login import login_required
 from database import get_db_connection
 from datetime import datetime
 
 meal_plans_bp = Blueprint('meal_plans', __name__, url_prefix="/api")
 
 @meal_plans_bp.route('/meal-plans')
+@login_required
 def get_meal_plans():
     conn = get_db_connection()
 
@@ -55,6 +57,7 @@ def is_valid_date(date_string):
         return False
 
 @meal_plans_bp.route('/meal-plans', methods=["POST"])
+@login_required
 def add_plans():
     conn = get_db_connection()
     if request.method == 'POST':
@@ -95,6 +98,7 @@ def add_plans():
     }), 201
 
 @meal_plans_bp.route('/meal-plans/<int:meal_id>', methods=['PATCH'])
+@login_required
 def update_meal(meal_id):
     conn = get_db_connection()
 
@@ -134,6 +138,7 @@ def update_meal(meal_id):
 
 
 @meal_plans_bp.route('/meal-plans/<int:meal_id>', methods = ['DELETE'])
+@login_required
 def delete_meal(meal_id):
     conn = get_db_connection()
     cursor = conn.cursor()

@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, abort, request, Blueprint
+from flask_login import login_required
 from database import get_db_connection
 import json
 
@@ -53,6 +54,7 @@ def get_recipe(recipe_id):
     return jsonify(result)
 
 @recipes_bp.route("/api/recipes", methods=['POST'])
+@login_required
 def create_recipe():
     data = request.get_json()
 
@@ -122,6 +124,7 @@ def create_recipe():
         conn.close()
 
 @recipes_bp.route("/api/recipes/<int:recipe_id>", methods=['DELETE'])
+@login_required
 def remove_recipe(recipe_id):
     conn = get_db_connection()
     cursor = conn.cursor()
