@@ -208,6 +208,13 @@ function createRecipeDetailHTML(recipe) {
                 ${instructionsList || `<li class="text-gray-500">${t('recipeDetail.noInstructions')}</li>`}
             </ol>
         </div>
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold mb-2 text-blue-400">Notes</h3>
+            <p>${recipe.notes}</p>
+        </div>
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold mb-2 text-pink-400 text-center">#${recipe.source}</h3>
+        </div>
     `;
 }
 
