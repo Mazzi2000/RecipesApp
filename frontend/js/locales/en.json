@@ -103,6 +103,18 @@
     "confirm": "Confirm",
     "back": "Back"
   },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "username": "Username",
+    "password": "Password",
+    "usernamePlaceholder": "Enter username",
+    "passwordPlaceholder": "Enter password",
+    "loginTitle": "Login",
+    "loggingIn": "Logging in...",
+    "loggedInAs": "Logged in as",
+    "loginRequired": "Please log in to use this feature"
+  },
   "errors": {
     "addingMeal": "Error adding meal",
     "addingError": "Error adding",
@@ -113,6 +125,9 @@
     "updatingServings": "Error updating servings",
     "creatingRecipe": "Error creating recipe",
     "loadingRecipes": "Error loading recipes",
-    "loadingMealPlan": "Failed to load meal plan"
+    "loadingMealPlan": "Failed to load meal plan",
+    "authCheck": "Error checking auth status",
+    "loginFailed": "Invalid username or password",
+    "logoutFailed": "Error logging out"
   }
 }

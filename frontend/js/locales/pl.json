@@ -103,6 +103,18 @@
     "confirm": "Potwierdź",
     "back": "Powrót"
   },
+  "auth": {
+    "login": "Zaloguj",
+    "logout": "Wyloguj",
+    "username": "Nazwa użytkownika",
+    "password": "Hasło",
+    "usernamePlaceholder": "Wpisz nazwę użytkownika",
+    "passwordPlaceholder": "Wpisz hasło",
+    "loginTitle": "Logowanie",
+    "loggingIn": "Logowanie...",
+    "loggedInAs": "Zalogowano jako",
+    "loginRequired": "Zaloguj się, aby korzystać z tej funkcji"
+  },
   "errors": {
     "addingMeal": "Błąd dodawania posiłku",
     "addingError": "Błąd dodawania",
@@ -113,6 +125,9 @@
     "updatingServings": "Błąd aktualizacji porcji",
     "creatingRecipe": "Błąd tworzenia przepisu",
     "loadingRecipes": "Błąd ładowania",
-    "loadingMealPlan": "Nie udało się załadować planu posiłków"
+    "loadingMealPlan": "Nie udało się załadować planu posiłków",
+    "authCheck": "Błąd sprawdzania statusu logowania",
+    "loginFailed": "Nieprawidłowa nazwa użytkownika lub hasło",
+    "logoutFailed": "Błąd wylogowania"
   }
 }

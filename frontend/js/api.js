@@ -201,3 +201,57 @@ export async function createRecipe(recipeData) {
 
     return await response.json();
 }
+
+/**
+ * Check current authentication status
+ * @returns {Promise<Object>} { authenticated: boolean, user?: {id, username}}
+ */
+export async function checkAuth() {
+    const response = await fetch(`${API_URL}/auth/me`);
+
+    if (!response.ok) {
+        throw new Error(t('errors.authCheck'));
+    }
+
+    return await response.json();
+}
+
+/**
+ * Login with username and password
+ * @param {string} username
+ * @param {string} password
+ * @returns {Promise<Object>} User data on success
+ * @throws {Error} If credentials are invalid
+ */
+export async function login(username, password) {
+    const response = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password })
+    });
+ 
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || t('errors.loginFailed'));
+    }
+ 
+    return await response.json();
+}
+ 
+/**
+ * Logout the current user
+ * @returns {Promise<Object>}
+ */
+export async function logout() {
+    const response = await fetch(`${API_URL}/auth/logout`, {
+        method: 'POST'
+    });
+ 
+    if (!response.ok) {
+        throw new Error(t('errors.logoutFailed'));
+    }
+ 
+    return await response.json();
+}
