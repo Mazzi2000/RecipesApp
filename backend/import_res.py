@@ -134,7 +134,7 @@ def import_centrumrespo(filepath):
             recipe.get('difficulty', ''),
             recipe.get('prep_time_min'),
             recipe.get('total_time_min'),
-            1,  # res recipes are per-serving
+            recipe.get('servings'),
             json.dumps(recipe.get('instructions', []), ensure_ascii=False),
             recipe.get('article_text', ''),
             nutrition.get('kcal', 0),
@@ -181,7 +181,7 @@ def import_centrumrespo(filepath):
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        filepath = '../data/res_recipes.json'
+        filepath = '../data/res_recipes_2.json'
     else:
         filepath = sys.argv[1]
     

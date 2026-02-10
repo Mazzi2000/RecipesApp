@@ -118,8 +118,7 @@ async function renderRecipeDetail(recipe) {
                 ` : ''}
             </div>
 
-            <h2 class="text-2xl font-bold text-orange-300 mb-4">${recipe.name}</h2>
-
+            <h2 class="text-3xl font-bold text-center text-orange-300 m-4">${recipe.name}</h2>
             ${detailHTML}
         </div>
     `;
@@ -182,6 +181,9 @@ function createRecipeDetailHTML(recipe) {
     `).join('');
 
     return `
+        <div class="mb-6">
+            <img src=${recipe.image_url} class="rounded-xl">
+        </div>
         <div class="grid grid-cols-4 gap-4 mb-6 text-center">
             <div class="bg-gray-800 p-3 rounded">
                 <div class="text-2xl">🔥</div>
@@ -206,7 +208,7 @@ function createRecipeDetailHTML(recipe) {
         </div>
 
         <div class="mb-6">
-            <h3 class="text-lg font-semibold mb-2 text-blue-400">${t('recipeDetail.ingredients')}</h3>
+            <h3 class="text-lg font-semibold mb-2 text-blue-400">${t('recipeDetail.ingredients')}( Liczba porcji: ${recipe.servings})</h3>
             <ul class="bg-gray-800 rounded p-4">
                 ${ingredientsList}
             </ul>
