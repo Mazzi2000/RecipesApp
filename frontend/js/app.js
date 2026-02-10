@@ -1121,8 +1121,9 @@ async function refreshAuthState() {
  */
 function updateAuthUI() {
     const authArea = document.getElementById('auth-area');
-    const addRecipeBtn = document.getElementById('add-recipe-btn');
-    const navPlannerBtn = document.getElementById('nav-planner-btn');
+    const mainNav = document.getElementById('main-nav');
+    const recipesView = document.getElementById('recipes-view');
+    const plannerView = document.getElementById('planner-view');
 
     if (isAuthenticated && currentUser) {
         authArea.innerHTML = `
@@ -1134,8 +1135,8 @@ function updateAuthUI() {
                 ${t('auth.logout')}
             </button>
         `;
-        addRecipeBtn.classList.remove('hidden');
-        navPlannerBtn.classList.remove('hidden');
+        mainNav.classList.remove('hidden');
+        recipesView.classList.remove('hidden');
     } else {
         authArea.innerHTML = `
             <button
@@ -1145,13 +1146,9 @@ function updateAuthUI() {
                 ${t('auth.login')}
             </button>
         `;
-        addRecipeBtn.classList.add('hidden');
-        navPlannerBtn.classList.add('hidden');
-
-        // If planner view is showing, switch back to recipes
-        if (!document.getElementById('planner-view').classList.contains('hidden')) {
-            showRecipesView();
-        }
+        mainNav.classList.add('hidden');
+        recipesView.classList.add('hidden');
+        plannerView.classList.add('hidden');
     }
 }
 
@@ -1189,7 +1186,6 @@ function showLoginModal() {
         title: t('auth.loginTitle'),
         body: bodyHTML,
         confirmText: t('auth.login'),
-        cancelText: t('buttons.cancel'),
         onConfirm: handleLoginSubmit
     });
 }
@@ -1247,9 +1243,7 @@ async function handleLogout() {
         await logout();
         await refreshAuthState();
         recipesCache = null;
-        const recipes = await fetchRecipes(currentCategory);
-        recipesCache = recipes;
-        renderRecipesList(recipes);
+        showLoginModal();
     } catch (error) {
         console.error('Logout failed:', error);
         showToast('❌ ' + error.message);
@@ -1384,12 +1378,17 @@ async function init() {
     // One global click handler for all actions
     document.addEventListener('click', handleGlobalClick);
 
-    try {
-        const recipes = await fetchRecipes();
-        recipesCache = recipes;
-        renderRecipesList(recipes);
-    } catch (error){
-        recipesListEl.innerHTML = `<p class="text-red-500 col-span-full text-center py-8">${t('errors.loadingRecipes')}: ${error.message}</p>`;
+    if (isAuthenticated) {
+        try {
+            const recipes = await fetchRecipes();
+            recipesCache = recipes;
+            renderRecipesList(recipes);
+        } catch (error){
+            recipesListEl.innerHTML = `<p class="text-red-500 col-span-full text-center py-8">${t('errors.loadingRecipes')}: ${error.message}</p>`;
+        }
+    } else {
+        // Not logged in — show login modal immediately
+        showLoginModal();
     }
 }
 
