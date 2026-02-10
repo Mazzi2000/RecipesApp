@@ -55,9 +55,12 @@ function getCategoryLabelNoEmoji(categoryValue) {
 
 function createRecipeCard(recipe) {
     return `
-        <article class ="bg-gray-800 rounded-lg p-4 shadow-lg hover:shadow-xl transition-shadow cursor-pointer" data-recipe-id="${recipe.id}">
+        <article class="bg-gray-800 rounded-lg p-4 shadow-lg hover:shadow-xl transition-shadow cursor-pointer" data-recipe-id="${recipe.id}">
 
-            <h3 class="text-lg font-semibold mb-2 text-teal-500">${recipe.name}</h3>
+            <h2 class="text-2xl text-center font-semibold mb-2 text-teal-500">${recipe.name}</h2>
+            <div class="mb-2">
+                <img src=${recipe.image_url} class="rounded-xl">
+            </div>
 
             <div class="flex gap-2 mb-3">
                 <span class="text-xs bg-blue-600 px-2 py-1 rounded">${getCategoryLabelNoEmoji(recipe.category)}</span>
@@ -616,7 +619,8 @@ async function showAddMealModal(mealType) {
     }
 
     // Filter recipes by meal type (optional)
-    const filteredRecipes = recipesCache.filter(r => r.category === mealType);
+    //const filteredRecipes = recipesCache.filter(r => r.category === mealType);
+    const filteredRecipes = recipesCache;
     const recipesToShow = filteredRecipes.length > 0 ? filteredRecipes : recipesCache;
 
     // Create modal body
