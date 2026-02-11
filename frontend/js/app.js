@@ -30,10 +30,17 @@ let recipesCache = null;
 let isAuthenticated = false;
 let currentUser = null;
 
+// Pagination state
+let currentPage = 1;
+let totalPages = 1;
+let totalRecipes = 0;
+const PER_PAGE = 20;
+
 // DOM REFERENCES
 const recipesListEl = document.getElementById('recipes-list');
 const recipeDetailEl = document.getElementById('recipe-detail');
 const filtersEl = document.getElementById('filters');
+const paginationEl = document.getElementById('pagination');
 
 // RENDER FUNCTIONS
 
@@ -94,6 +101,88 @@ function renderRecipesList(recipes) {
 
     addRecipeCardListeners();
 
+}
+
+/**
+ * Render pagination controls
+ */
+function renderPagination() {
+    if (totalPages <= 1) {
+        paginationEl.innerHTML = '';
+        return;
+    }
+ 
+    const from = (currentPage - 1) * PER_PAGE + 1;
+    const to = Math.min(currentPage * PER_PAGE, totalRecipes);
+ 
+    // Build page number buttons - show up to 5 page numbers around current page
+    let pageButtons = '';
+    const startPage = Math.max(1, currentPage - 2);
+    const endPage = Math.min(totalPages, currentPage + 2);
+ 
+    if (startPage > 1) {
+        pageButtons += `<button data-action="go-to-page" data-page="1"
+            class="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 cursor-pointer text-sm">1</button>`;
+        if (startPage > 2) {
+            pageButtons += `<span class="text-gray-500">...</span>`;
+        }
+    }
+ 
+    for (let i = startPage; i <= endPage; i++) {
+        const isActive = i === currentPage;
+        pageButtons += `<button data-action="go-to-page" data-page="${i}"
+            class="px-3 py-1 rounded text-sm cursor-pointer ${isActive
+                ? 'bg-blue-600 text-white font-bold'
+                : 'bg-gray-700 hover:bg-gray-600'}">${i}</button>`;
+    }
+ 
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+            pageButtons += `<span class="text-gray-500">...</span>`;
+        }
+        pageButtons += `<button data-action="go-to-page" data-page="${totalPages}"
+            class="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 cursor-pointer text-sm">${totalPages}</button>`;
+    }
+ 
+    paginationEl.innerHTML = `
+        <button data-action="prev-page"
+            class="px-4 py-2 rounded bg-gray-700 hover:bg-gray-600 cursor-pointer text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+            ${currentPage <= 1 ? 'disabled' : ''}>
+            ${t('pagination.previous')}
+        </button>
+        ${pageButtons}
+        <button data-action="next-page"
+            class="px-4 py-2 rounded bg-gray-700 hover:bg-gray-600 cursor-pointer text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+            ${currentPage >= totalPages ? 'disabled' : ''}>
+            ${t('pagination.next')}
+        </button>
+        <span class="text-gray-400 text-sm ml-2">
+            ${t('pagination.showing', { from, to, total: totalRecipes })}
+        </span>
+    `;
+}
+ 
+/**
+ * Load a specific page of recipes
+ * @param {number} page
+ */
+async function loadPage(page) {
+    currentPage = page;
+    recipesListEl.innerHTML = `<p class="col-span-full text-center">${t('app.loading')}</p>`;
+    paginationEl.innerHTML = '';
+ 
+    try {
+        const data = await fetchRecipes({ category: currentCategory, page: currentPage, perPage: PER_PAGE });
+        totalPages = data.total_pages;
+        totalRecipes = data.total;
+        currentPage = data.page;
+        recipesCache = data.recipes;
+        renderRecipesList(data.recipes);
+        renderPagination();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (error) {
+        recipesListEl.innerHTML = `<p class="text-red-500 col-span-full text-center">${t('app.error')}: ${error.message}</p>`;
+    }
 }
 
 /**
@@ -403,16 +492,13 @@ function addRecipeCardListeners(){
 async function filterByCategory(category) {
     currentCategory = category;
 
+    currentPage = 1;
+
     renderFilters();
 
     recipesListEl.innerHTML = `<p class="col-span-full text-center">${t('app.loading')}</p>`;
 
-    try {
-        const recipes = await fetchRecipes(category);
-        renderRecipesList(recipes);
-    } catch (error) {
-        recipesListEl.innerHTML = `<p class="text-red-500 col-span-full text-center">${t('app.error')}: ${error.message}</p>`;
-    }
+    await loadPage(1);
 }
 
 function updateDateDisplay() {
@@ -479,8 +565,7 @@ async function handleRemoveRecipe(recipeId) {
                 await removeRecipe(recipeId);
                 modal.close();
                 recipesCache = null;
-                const recipes = await fetchRecipes(currentCategory)
-                renderRecipesList(recipes)
+                await loadPage(currentPage);
                 await showRecipesView();
                 showToast('✅ ' + t('toast.recipeDeleted'));
             } catch (error) {
@@ -552,6 +637,8 @@ async function showRecipeDetail(recipeId){
 
         recipesListEl.classList.add('hidden');
         filtersEl.classList.add('hidden');
+        paginationEl.classList.add('hidden');
+
 
         const recipe = await fetchRecipe(recipeId);
 
@@ -572,6 +659,7 @@ function showRecipesList(){
 
     recipesListEl.classList.remove('hidden');
     filtersEl.classList.remove('hidden');
+    paginationEl.classList.remove('hidden');
 }
 
 async function loadMealPlan() {
@@ -610,20 +698,17 @@ async function showAddMealModal(mealType) {
         'snack': '🥨 ' + t('categories.snack')
     };
 
-    // Load recipes if not cached
-    if (!recipesCache) {
-        try {
-            recipesCache = await fetchRecipes();
-        } catch (error) {
-            alert(t('errors.loadingRecipes'));
-            return;
-        }
+    // Load all recipes for meal selection (unpaginated)
+    let allRecipes;
+    try {
+        allRecipes = await fetchRecipes({ page: null });
+    } catch (error) {
+        alert(t('errors.loadingRecipes'));
+        return;
     }
 
-    // Filter recipes by meal type (optional)
     //const filteredRecipes = recipesCache.filter(r => r.category === mealType);
-    const filteredRecipes = recipesCache;
-    const recipesToShow = filteredRecipes.length > 0 ? filteredRecipes : recipesCache;
+    const recipesToShow = allRecipes;
 
     // Create modal body
     const bodyHTML = `
@@ -958,8 +1043,8 @@ async function handleAddRecipeSubmit() {
         showToast('✅ ' + t('toast.recipeAdded'));
 
         recipesCache = null;
-        const recipes = await fetchRecipes(currentCategory);
-        renderRecipesList(recipes);
+        currentPage = 1;
+        await loadPage(1);
 
     } catch (error) {
         console.error('Error creating recipe:', error);
@@ -1227,9 +1312,8 @@ async function handleLoginSubmit() {
         modal.close();
         await refreshAuthState();
         recipesCache = null;
-        const recipes = await fetchRecipes(currentCategory);
-        recipesCache = recipes;
-        renderRecipesList(recipes);
+        currentPage = 1;
+        await loadPage(1);
         showToast('✅ ' + t('auth.login') + '!');
     } catch (error) {
         // Re-show form with error
@@ -1253,9 +1337,8 @@ async function handleLogout() {
         await logout();
         await refreshAuthState();
         recipesCache = null;
-        const recipes = await fetchRecipes(currentCategory);
-        recipesCache = recipes;
-        renderRecipesList(recipes);
+        currentPage = 1;
+        await loadPage(1);
     } catch (error) {
         console.error('Logout failed:', error);
         showToast('❌ ' + error.message);
@@ -1308,6 +1391,15 @@ function handleGlobalClick(e) {
             break;
         case 'show-add-recipe-form':
             showAddRecipeForm();
+            break;
+        case 'prev-page':
+            if (currentPage > 1) loadPage(currentPage - 1);
+            break;
+        case 'next-page':
+            if (currentPage < totalPages) loadPage(currentPage + 1);
+            break;
+        case 'go-to-page':
+            loadPage(parseInt(e.target.dataset.page));
             break;
         case 'set-language':
             setLanguage(e.target.dataset.lang);
@@ -1366,10 +1458,8 @@ function handleLanguageChange() {
 
     // Re-render recipes list if visible
     if (!document.getElementById('recipes-view').classList.contains('hidden') && recipesCache) {
-        const filteredRecipes = currentCategory
-            ? recipesCache.filter(r => r.category === currentCategory)
-            : recipesCache;
-        renderRecipesList(filteredRecipes);
+        renderRecipesList(recipesCache);
+        renderPagination();
     }
 }
 
@@ -1391,9 +1481,7 @@ async function init() {
     document.addEventListener('click', handleGlobalClick);
 
     try {
-        const recipes = await fetchRecipes();
-        recipesCache = recipes;
-        renderRecipesList(recipes);
+        await loadPage(1);
     } catch (error){
         recipesListEl.innerHTML = `<p class="text-red-500 col-span-full text-center py-8">${t('errors.loadingRecipes')}: ${error.message}</p>`;
     }

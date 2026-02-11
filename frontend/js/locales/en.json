@@ -98,6 +98,12 @@
     "pinch": "pinch",
     "toTaste": "to taste"
   },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {{page}} of {{totalPages}}",
+    "showing": "Showing {{from}}-{{to}} of {{total}} recipes"
+  },
   "buttons": {
     "cancel": "Cancel",
     "confirm": "Confirm",

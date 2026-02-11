@@ -16,6 +16,8 @@ def get_recipes():
     category = request.args.get('category')
     tag = request.args.get('tag')  # NEW: filter by recipe_categories tag
     search = request.args.get('search')
+    page = request.args.get('page', type=int)
+    per_page = request.args.get('per_page', 20, type=int)
 
     if category and category not in VALID_CATEGORIES:
         return jsonify({
@@ -23,12 +25,14 @@ def get_recipes():
             "valid_categories": VALID_CATEGORIES
         }), 400
 
-    query = "SELECT DISTINCT r.* FROM recipes r"
+    per_page = min(per_page, 100)
+
+    base_from = "FROM recipes r"
     conditions = []
     params = []
 
     if tag:
-        query += " JOIN recipe_categories rc ON r.id = rc.recipe_id"
+        base_from += " JOIN recipe_categories rc ON r.id = rc.recipe_id"
         conditions.append("rc.category_name = ?")
         params.append(tag)
 
@@ -40,17 +44,40 @@ def get_recipes():
         conditions.append("r.name LIKE ?")
         params.append(f"%{search}%")
 
+    where_clause = ""
     if conditions:
-        query += " WHERE " + " AND ".join(conditions)
+        where_clause = " WHERE " + " AND ".join(conditions)
+ 
+    # If no page parameter, return all results (backwards compatible)
+    if page is None:
+        query = f"SELECT DISTINCT r.* {base_from}{where_clause} ORDER BY r.id DESC"
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+        connection.close()
+        return jsonify([dict(row) for row in rows])
+ 
+    # Count total matching recipes
+    count_query = f"SELECT COUNT(DISTINCT r.id) {base_from}{where_clause}"
+    cursor.execute(count_query, params)
+    total = cursor.fetchone()[0]
+    total_pages = max(1, (total + per_page - 1) // per_page)
 
-    query += " ORDER BY r.id DESC"
+    page = max(1, min(page, total_pages))
+    offset = (page - 1) * per_page
 
-    cursor.execute(query, params)
+    query = f"SELECT DISTINCT r.* {base_from}{where_clause} ORDER BY r.id DESC LIMIT ? OFFSET ?"
+    cursor.execute(query, params + [per_page, offset])
+
     rows = cursor.fetchall()
     connection.close()
 
-    recipes_list = [dict(row) for row in rows]
-    return jsonify(recipes_list)
+    return jsonify({
+        "recipes": [dict(row) for row in rows],
+        "page": page,
+        "per_page": per_page,
+        "total": total,
+        "total_pages": total_pages
+    })
 
 
 @recipes_bp.route("/api/recipes/<int:recipe_id>")
