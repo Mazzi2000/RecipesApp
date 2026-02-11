@@ -3,15 +3,24 @@ import { t } from './i18n.js';
 const API_URL = '/api';
 
 /**
- * Fetch all recipes with optional category filter
- * @param {string|null} category - Filter by category (e.g., 'breakfast', 'lunch') or null for all
- * @returns {Promise<Array>} Array of recipe objects
+ * Fetch recipes with optional category filter and pagination
+ * @param {Object} options
+ * @param {string|null} options.category - Filter by category (e.g., 'breakfast', 'lunch') or null for all
+ * @param {number|null} options.page - Page number (1-based). If null, returns all recipes.
+ * @param {number} options.perPage - Results per page (default 20, max 100)
+ * @returns {Promise<Object>} Paginated response: { recipes, page, per_page, total, total_pages }
  * @throws {Error} If HTTP request fails
  */
-export async function fetchRecipes(category = null) {
+export async function fetchRecipes({ category = null, page = 1, perPage = 20 } = {}) {
+    const params = [];
+
+    if (category) params.push(`category=${category}`);
+    if (page != null) params.push(`page=${page}`);
+    if (perPage) params.push(`per_page=${perPage}`);
+
     let url = `${API_URL}/recipes`;
-    if (category) {
-        url += `?category=${category}`;
+    if (params.length > 0) {
+        url += '?' + params.join('&');
     }
 
     const response = await fetch(url);

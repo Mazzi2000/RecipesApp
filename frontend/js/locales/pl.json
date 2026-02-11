@@ -98,6 +98,12 @@
     "pinch": "szczypta",
     "toTaste": "do smaku"
   },
+  "pagination": {
+    "previous": "Poprzednia",
+    "next": "Następna",
+    "pageOf": "Strona {{page}} z {{totalPages}}",
+    "showing": "Wyświetlanie {{from}}-{{to}} z {{total}} przepisów"
+  },
   "buttons": {
     "cancel": "Anuluj",
     "confirm": "Potwierdź",
