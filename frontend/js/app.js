@@ -26,6 +26,8 @@ const CATEGORIES = [
 // State
 let currentDate = new Date();
 let currentCategory = null;
+let currentSearch = '';
+let searchTimeout = null;
 let recipesCache = null;
 let isAuthenticated = false;
 let currentUser = null;
@@ -172,7 +174,7 @@ async function loadPage(page) {
     paginationEl.innerHTML = '';
  
     try {
-        const data = await fetchRecipes({ category: currentCategory, page: currentPage, perPage: PER_PAGE });
+        const data = await fetchRecipes({ category: currentCategory, search: currentSearch || null, page: currentPage, perPage: PER_PAGE });
         totalPages = data.total_pages;
         totalRecipes = data.total;
         currentPage = data.page;
@@ -501,6 +503,40 @@ async function filterByCategory(category) {
     await loadPage(1);
 }
 
+/**
+ * Setup the main search bar with debounced input
+ */
+function setupMainSearch() {
+    const searchInput = document.getElementById('recipe-search-main');
+    const clearBtn = document.getElementById('search-clear-btn');
+ 
+    searchInput.placeholder = t('recipes.searchPlaceholder');
+ 
+    searchInput.addEventListener('input', (e) => {
+        const value = e.target.value.trim();
+ 
+        // Show/hide clear button
+        clearBtn.classList.toggle('hidden', value.length === 0);
+ 
+        // Debounce: wait 300ms after user stops typing before searching
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            currentSearch = value;
+            currentPage = 1;
+            loadPage(1);
+        }, 300);
+    });
+ 
+    clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        clearBtn.classList.add('hidden');
+        currentSearch = '';
+        currentPage = 1;
+        loadPage(1);
+        searchInput.focus();
+    });
+}
+
 function updateDateDisplay() {
     document.getElementById('current-date').textContent = formatDate(currentDate);
 }
@@ -638,6 +674,7 @@ async function showRecipeDetail(recipeId){
         recipesListEl.classList.add('hidden');
         filtersEl.classList.add('hidden');
         paginationEl.classList.add('hidden');
+        document.getElementById('search-container').classList.add('hidden');
 
 
         const recipe = await fetchRecipe(recipeId);
@@ -660,6 +697,7 @@ function showRecipesList(){
     recipesListEl.classList.remove('hidden');
     filtersEl.classList.remove('hidden');
     paginationEl.classList.remove('hidden');
+    document.getElementById('search-container').classList.remove('hidden');
 }
 
 async function loadMealPlan() {
@@ -1427,6 +1465,9 @@ function updateStaticUI() {
     // Update add recipe button
     document.getElementById('add-recipe-btn').innerHTML = '➕ ' + t('nav.addRecipe');
 
+    // Update search placeholder
+    document.getElementById('recipe-search-main').placeholder = t('recipes.searchPlaceholder');
+
     // Update language switcher active state
     const langButtons = document.querySelectorAll('[data-action="set-language"]');
     const currentLang = getLanguage();
@@ -1476,6 +1517,7 @@ async function init() {
     updateStaticUI();
 
     renderFilters();
+    setupMainSearch();
 
     // One global click handler for all actions
     document.addEventListener('click', handleGlobalClick);

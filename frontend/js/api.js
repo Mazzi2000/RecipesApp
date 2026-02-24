@@ -11,10 +11,11 @@ const API_URL = '/api';
  * @returns {Promise<Object>} Paginated response: { recipes, page, per_page, total, total_pages }
  * @throws {Error} If HTTP request fails
  */
-export async function fetchRecipes({ category = null, page = 1, perPage = 20 } = {}) {
+export async function fetchRecipes({ category = null, search=null, page = 1, perPage = 20 } = {}) {
     const params = [];
  
     if (category) params.push(`category=${category}`);
+    if (search) params.push(`search=${search}`);
     if (page != null) params.push(`page=${page}`);
     if (perPage) params.push(`per_page=${perPage}`);
 

@@ -14,3 +14,6 @@ venv/
 
 # macOS
 .DS_Store
+
+#VSC
+.vscode
