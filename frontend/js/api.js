@@ -250,6 +250,60 @@ export async function login(username, password) {
 }
  
 /**
+ * Get all favorite recipes for the current user
+ * @returns {Promise<Array>} Array of recipe objects
+ */
+export async function fetchFavorites() {
+    const response = await fetch(`${API_URL}/favorites`);
+    if (!response.ok) {
+        throw new Error(t('errors.loadingFavorites'));
+    }
+    return await response.json();
+}
+
+/**
+ * Get IDs of all favorite recipes for the current user
+ * @returns {Promise<Array<number>>} Array of recipe IDs
+ */
+export async function fetchFavoriteIds() {
+    const response = await fetch(`${API_URL}/favorites/ids`);
+    if (!response.ok) {
+        throw new Error(t('errors.loadingFavorites'));
+    }
+    return await response.json();
+}
+
+/**
+ * Add a recipe to favorites
+ * @param {number} recipeId
+ * @returns {Promise<Object>}
+ */
+export async function addFavorite(recipeId) {
+    const response = await fetch(`${API_URL}/favorites/${recipeId}`, {
+        method: 'POST'
+    });
+    if (!response.ok) {
+        throw new Error(t('errors.addingFavorite'));
+    }
+    return await response.json();
+}
+
+/**
+ * Remove a recipe from favorites
+ * @param {number} recipeId
+ * @returns {Promise<Object>}
+ */
+export async function removeFavorite(recipeId) {
+    const response = await fetch(`${API_URL}/favorites/${recipeId}`, {
+        method: 'DELETE'
+    });
+    if (!response.ok) {
+        throw new Error(t('errors.removingFavorite'));
+    }
+    return await response.json();
+}
+
+/**
  * Logout the current user
  * @returns {Promise<Object>}
  */

@@ -4,6 +4,7 @@ from routes.recipes import recipes_bp
 from routes.statistics import statistics_bp
 from routes.meal_plans import meal_plans_bp
 from routes.auth import auth_bp, User
+from routes.favorites import favorites_bp
 from database import get_db_connection
 from dotenv import load_dotenv
 import os
@@ -45,6 +46,24 @@ app.register_blueprint(recipes_bp)
 app.register_blueprint(statistics_bp)
 app.register_blueprint(meal_plans_bp)
 app.register_blueprint(auth_bp)
+app.register_blueprint(favorites_bp)
+
+# Ensure favorites table exists (migration for existing databases)
+with app.app_context():
+    conn = get_db_connection()
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS favorites (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            recipe_id INTEGER NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON DELETE CASCADE,
+            UNIQUE(user_id, recipe_id)
+        )
+    ''')
+    conn.commit()
+    conn.close()
 
 @app.errorhandler(404)
 def request_error(error):

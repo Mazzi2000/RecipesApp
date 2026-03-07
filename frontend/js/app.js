@@ -10,7 +10,11 @@ import {
     createRecipe,
     checkAuth,
     login,
-    logout
+    logout,
+    fetchFavorites,
+    fetchFavoriteIds,
+    addFavorite,
+    removeFavorite
 } from './api.js';
 import modal  from './modal.js';
 import { t, getLanguage, setLanguage, onLanguageChange } from './i18n.js';
@@ -31,6 +35,7 @@ let searchTimeout = null;
 let recipesCache = null;
 let isAuthenticated = false;
 let currentUser = null;
+let favoriteIds = new Set();
 
 // Pagination state
 let currentPage = 1;
@@ -63,9 +68,20 @@ function getCategoryLabelNoEmoji(categoryValue) {
 }
 
 function createRecipeCard(recipe) {
-    return `
-        <article class="bg-gray-800 rounded-lg p-4 shadow-lg hover:shadow-xl transition-shadow cursor-pointer" data-recipe-id="${recipe.id}">
+    const isFav = favoriteIds.has(recipe.id);
+    const favButton = isAuthenticated ? `
+        <button
+            data-action="toggle-favorite"
+            data-recipe-id="${recipe.id}"
+            class="absolute top-2 right-2 text-2xl transition-transform hover:scale-110 z-10"
+            title="${isFav ? t('favorites.remove') : t('favorites.add')}">
+            ${isFav ? '❤️' : '🤍'}
+        </button>
+    ` : '';
 
+    return `
+        <article class="bg-gray-800 rounded-lg p-4 shadow-lg hover:shadow-xl transition-shadow cursor-pointer relative" data-recipe-id="${recipe.id}">
+            ${favButton}
             <h2 class="text-2xl text-center font-semibold mb-2 text-teal-500">${recipe.name}</h2>
             <div class="mb-2">
                 <img src=${recipe.image_url} class="rounded-xl">
@@ -195,18 +211,27 @@ async function renderRecipeDetail(recipe) {
 
     recipeDetailEl.innerHTML = `
         <div class="max-w-2xl mx-auto">
-            <div class="flex justify-between">
+            <div class="flex justify-between items-center">
                 <button data-action="back-to-list" class="mb-4 text-xl text-blue-400 cursor-pointer hover:text-blue-300">
                     ← ${t('recipes.backToList')}
                 </button>
-                ${isAuthenticated ? `
-                <button
-                    data-action="remove-recipe"
-                    data-recipe-id="${recipe.id}"
-                    class="rounded-md bg-pink-500 px-2.5 py-1.5 text-sm font-semibold text-white hover:bg-pink-600 transition-colors cursor-pointer">
-                        ${t('recipes.delete')} 🗑️
-                </button>
-                ` : ''}
+                <div class="flex gap-2 items-center">
+                    ${isAuthenticated ? `
+                    <button
+                        data-action="toggle-favorite"
+                        data-recipe-id="${recipe.id}"
+                        class="text-3xl transition-transform hover:scale-110 cursor-pointer"
+                        title="${favoriteIds.has(recipe.id) ? t('favorites.remove') : t('favorites.add')}">
+                        ${favoriteIds.has(recipe.id) ? '❤️' : '🤍'}
+                    </button>
+                    <button
+                        data-action="remove-recipe"
+                        data-recipe-id="${recipe.id}"
+                        class="rounded-md bg-pink-500 px-2.5 py-1.5 text-sm font-semibold text-white hover:bg-pink-600 transition-colors cursor-pointer">
+                            ${t('recipes.delete')} 🗑️
+                    </button>
+                    ` : ''}
+                </div>
             </div>
 
             <h2 class="text-3xl font-bold text-center text-orange-300 m-4">${recipe.name}</h2>
@@ -484,7 +509,9 @@ function addRecipeCardListeners(){
     const cards = recipesListEl.querySelectorAll('[data-recipe-id]');
 
     cards.forEach(card => {
-        card.addEventListener('click', () =>{
+        if (card.dataset.action === 'toggle-favorite') return;
+        card.addEventListener('click', (e) =>{
+            if (e.target.closest('[data-action="toggle-favorite"]')) return;
             const recipeId = card.dataset.recipeId
             showRecipeDetail(recipeId);
         });
@@ -714,6 +741,7 @@ async function loadMealPlan() {
 function showRecipesView() {
     document.getElementById('recipes-view').classList.remove('hidden');
     document.getElementById('planner-view').classList.add('hidden');
+    document.getElementById('favorites-view').classList.add('hidden');
     showRecipesList();
 }
 
@@ -721,6 +749,7 @@ function showPlannerView() {
     document.getElementById('planner-view').classList.remove('hidden');
     document.getElementById('recipes-view').classList.add('hidden');
     document.getElementById('recipe-detail').classList.add('hidden');
+    document.getElementById('favorites-view').classList.add('hidden');
     loadMealPlan()
 }
 
@@ -1227,6 +1256,110 @@ function showToast(message) {
     }, 3000);
 }
 
+// FAVORITES
+
+/**
+ * Load favorite IDs for the current user
+ */
+async function loadFavoriteIds() {
+    if (!isAuthenticated) {
+        favoriteIds = new Set();
+        return;
+    }
+    try {
+        const ids = await fetchFavoriteIds();
+        favoriteIds = new Set(ids);
+    } catch (error) {
+        console.error('Failed to load favorite IDs:', error);
+        favoriteIds = new Set();
+    }
+}
+
+/**
+ * Toggle favorite status for a recipe
+ * @param {number} recipeId
+ */
+async function handleToggleFavorite(recipeId) {
+    if (!isAuthenticated) return;
+
+    const id = parseInt(recipeId);
+    try {
+        if (favoriteIds.has(id)) {
+            await removeFavorite(id);
+            favoriteIds.delete(id);
+            showToast('💔 ' + t('toast.favoriteRemoved'));
+        } else {
+            await addFavorite(id);
+            favoriteIds.add(id);
+            showToast('❤️ ' + t('toast.favoriteAdded'));
+        }
+
+        // Re-render current view to update heart icons
+        if (!document.getElementById('favorites-view').classList.contains('hidden')) {
+            await renderFavoritesView();
+        } else if (recipesCache) {
+            renderRecipesList(recipesCache);
+            renderPagination();
+        }
+
+        // Update recipe detail if visible
+        if (!recipeDetailEl.classList.contains('hidden')) {
+            const recipe = await fetchRecipe(id);
+            renderRecipeDetail(recipe);
+        }
+    } catch (error) {
+        console.error('Error toggling favorite:', error);
+        showToast('❌ ' + t('app.error'));
+    }
+}
+
+/**
+ * Show favorites view
+ */
+async function showFavoritesView() {
+    document.getElementById('recipes-view').classList.add('hidden');
+    document.getElementById('planner-view').classList.add('hidden');
+    document.getElementById('recipe-detail').classList.add('hidden');
+    document.getElementById('favorites-view').classList.remove('hidden');
+
+    await renderFavoritesView();
+}
+
+/**
+ * Render favorites view content
+ */
+async function renderFavoritesView() {
+    const favoritesListEl = document.getElementById('favorites-list');
+    document.getElementById('favorites-title').textContent = '❤️ ' + t('favorites.title');
+    favoritesListEl.innerHTML = `<p class="col-span-full text-center">${t('app.loading')}</p>`;
+
+    try {
+        const favorites = await fetchFavorites();
+
+        if (favorites.length === 0) {
+            favoritesListEl.innerHTML = `
+                <p class="text-gray-500 col-span-full text-center py-8">
+                    ${t('favorites.noFavorites')}
+                </p>
+            `;
+            return;
+        }
+
+        favoritesListEl.innerHTML = favorites.map(recipe => createRecipeCard(recipe)).join('');
+
+        // Add click listeners to cards (excluding favorite buttons)
+        favoritesListEl.querySelectorAll('[data-recipe-id]').forEach(card => {
+            if (card.dataset.action === 'toggle-favorite') return;
+            card.addEventListener('click', (e) => {
+                if (e.target.closest('[data-action="toggle-favorite"]')) return;
+                showRecipeDetail(card.dataset.recipeId);
+            });
+        });
+    } catch (error) {
+        favoritesListEl.innerHTML = `<p class="text-red-500 col-span-full text-center">${t('app.error')}: ${error.message}</p>`;
+    }
+}
+
 // AUTH UI
  
 /**
@@ -1252,7 +1385,8 @@ function updateAuthUI() {
     const authArea = document.getElementById('auth-area');
     const addRecipeBtn = document.getElementById('add-recipe-btn');
     const navPlannerBtn = document.getElementById('nav-planner-btn');
- 
+    const navFavoritesBtn = document.getElementById('nav-favorites-btn');
+
     if (isAuthenticated && currentUser) {
         authArea.innerHTML = `
             <span class="text-sm text-gray-300">${t('auth.loggedInAs')} <strong>${currentUser.username}</strong></span>
@@ -1265,6 +1399,7 @@ function updateAuthUI() {
         `;
         addRecipeBtn.classList.remove('hidden');
         navPlannerBtn.classList.remove('hidden');
+        navFavoritesBtn.classList.remove('hidden');
     } else {
         authArea.innerHTML = `
             <button
@@ -1276,9 +1411,11 @@ function updateAuthUI() {
         `;
         addRecipeBtn.classList.add('hidden');
         navPlannerBtn.classList.add('hidden');
- 
-        // If planner view is showing, switch back to recipes
-        if (!document.getElementById('planner-view').classList.contains('hidden')) {
+        navFavoritesBtn.classList.add('hidden');
+
+        // If planner or favorites view is showing, switch back to recipes
+        if (!document.getElementById('planner-view').classList.contains('hidden') ||
+            !document.getElementById('favorites-view').classList.contains('hidden')) {
             showRecipesView();
         }
     }
@@ -1349,6 +1486,7 @@ async function handleLoginSubmit() {
         await login(username, password);
         modal.close();
         await refreshAuthState();
+        await loadFavoriteIds();
         recipesCache = null;
         currentPage = 1;
         await loadPage(1);
@@ -1374,6 +1512,7 @@ async function handleLogout() {
     try {
         await logout();
         await refreshAuthState();
+        favoriteIds = new Set();
         recipesCache = null;
         currentPage = 1;
         await loadPage(1);
@@ -1448,6 +1587,13 @@ function handleGlobalClick(e) {
         case 'do-logout':
             handleLogout();
             break;
+        case 'nav-favorites':
+            showFavoritesView();
+            break;
+        case 'toggle-favorite':
+            e.stopPropagation();
+            handleToggleFavorite(e.target.dataset.recipeId);
+            break;
     }
 }
 
@@ -1461,6 +1607,9 @@ function updateStaticUI() {
     // Update navigation buttons
     document.getElementById('nav-recipes-btn').innerHTML = '📖 ' + t('nav.recipes');
     document.getElementById('nav-planner-btn').innerHTML = '📅 ' + t('nav.mealPlanner');
+
+    // Update favorites nav button
+    document.getElementById('nav-favorites-btn').innerHTML = '❤️ ' + t('nav.favorites');
 
     // Update add recipe button
     document.getElementById('add-recipe-btn').innerHTML = '➕ ' + t('nav.addRecipe');
@@ -1502,6 +1651,11 @@ function handleLanguageChange() {
         renderRecipesList(recipesCache);
         renderPagination();
     }
+
+    // Re-render favorites if visible
+    if (!document.getElementById('favorites-view').classList.contains('hidden')) {
+        renderFavoritesView();
+    }
 }
 
 // INITIALIZATION
@@ -1512,6 +1666,9 @@ async function init() {
 
     // Check auth status first
     await refreshAuthState();
+
+    // Load favorite IDs if authenticated
+    await loadFavoriteIds();
 
     // Update static UI elements
     updateStaticUI();
