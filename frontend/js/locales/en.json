@@ -7,6 +7,7 @@
   "nav": {
     "recipes": "Recipes",
     "mealPlanner": "Meal Planner",
+    "favorites": "Favorites",
     "addRecipe": "Add recipe"
   },
   "categories": {
@@ -54,11 +55,19 @@
     "mealWillBeDeleted": "will be deleted from your plan.",
     "deleting": "Deleting..."
   },
+  "favorites": {
+    "title": "Favorite Recipes",
+    "add": "Add to favorites",
+    "remove": "Remove from favorites",
+    "noFavorites": "No favorite recipes yet. Click the heart on any recipe to add it!"
+  },
   "toast": {
     "recipeDeleted": "Recipe deleted!",
     "mealDeleted": "Meal deleted!",
     "mealAdded": "Meal added to plan!",
     "recipeAdded": "Recipe added!",
+    "favoriteAdded": "Added to favorites!",
+    "favoriteRemoved": "Removed from favorites",
     "servingsError": "Error changing servings"
   },
   "addRecipeForm": {
@@ -134,6 +143,9 @@
     "loadingMealPlan": "Failed to load meal plan",
     "authCheck": "Error checking auth status",
     "loginFailed": "Invalid username or password",
-    "logoutFailed": "Error logging out"
+    "logoutFailed": "Error logging out",
+    "loadingFavorites": "Error loading favorites",
+    "addingFavorite": "Error adding to favorites",
+    "removingFavorite": "Error removing from favorites"
   }
 }

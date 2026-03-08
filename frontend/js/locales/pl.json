@@ -7,6 +7,7 @@
   "nav": {
     "recipes": "Przepisy",
     "mealPlanner": "Planer posiłków",
+        "favorites": "Ulubione",
     "addRecipe": "Dodaj przepis"
   },
   "categories": {
@@ -54,11 +55,19 @@
     "mealWillBeDeleted": "zostanie usunięty z Twojego planu.",
     "deleting": "Usuwanie..."
   },
+   "favorites": {
+    "title": "Ulubione przepisy",
+    "add": "Dodaj do ulubionych",
+    "remove": "Usuń z ulubionych",
+    "noFavorites": "Brak ulubionych przepisów. Kliknij serduszko przy przepisie, aby go dodać!"
+  },
   "toast": {
     "recipeDeleted": "Przepis usunięty!",
     "mealDeleted": "Posiłek usunięty!",
     "mealAdded": "Posiłek dodany do planu!",
     "recipeAdded": "Przepis dodany!",
+    "favoriteAdded": "Dodano do ulubionych!",
+    "favoriteRemoved": "Usunięto z ulubionych",
     "servingsError": "Błąd zmiany porcji"
   },
   "addRecipeForm": {
@@ -134,6 +143,9 @@
     "loadingMealPlan": "Nie udało się załadować planu posiłków",
     "authCheck": "Błąd sprawdzania statusu logowania",
     "loginFailed": "Nieprawidłowa nazwa użytkownika lub hasło",
-    "logoutFailed": "Błąd wylogowania"
+    "logoutFailed": "Błąd wylogowania",
+    "loadingFavorites": "Błąd ładowania ulubionych",
+    "addingFavorite": "Błąd dodawania do ulubionych",
+    "removingFavorite": "Błąd usuwania z ulubionych"
   }
 }
