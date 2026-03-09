@@ -87,7 +87,7 @@ function createRecipeCard(recipe) {
 
             <h2 class="text-2xl text-center font-semibold mb-2 text-teal-500">${recipe.name}</h2>
             <div class="mb-2">
-                <img src=${recipe.image_url} class="rounded-xl">
+                <img src=${recipe.image_url} class="rounded-xl" loading="lazy" alt="${recipe.name}">
             </div>
 
             <div class="flex gap-2 mb-3">
@@ -301,7 +301,7 @@ function createRecipeDetailHTML(recipe) {
 
     return `
         <div class="mb-6">
-            <img src=${recipe.image_url} class="rounded-xl">
+            <img src=${recipe.image_url} class="rounded-xl" loading="lazy" alt="${recipe.name}">
         </div>
         <div class="grid grid-cols-4 gap-4 mb-6 text-center">
             <div class="bg-gray-800 p-3 rounded">
