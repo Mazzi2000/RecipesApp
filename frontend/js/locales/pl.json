@@ -146,6 +146,7 @@
     "logoutFailed": "Błąd wylogowania",
     "loadingFavorites": "Błąd ładowania ulubionych",
     "addingFavorite": "Błąd dodawania do ulubionych",
-    "removingFavorite": "Błąd usuwania z ulubionych"
+    "removingFavorite": "Błąd usuwania z ulubionych",
+    "loginRequired": "Zaloguj się, aby kontynuować"
   }
 }

@@ -146,6 +146,7 @@
     "logoutFailed": "Error logging out",
     "loadingFavorites": "Error loading favorites",
     "addingFavorite": "Error adding to favorites",
-    "removingFavorite": "Error removing from favorites"
+    "removingFavorite": "Error removing from favorites",
+    "loginRequired": "Please log in to continue"
   }
 }

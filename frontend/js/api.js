@@ -26,6 +26,9 @@ export async function fetchRecipes({ category = null, search=null, page = 1, per
     const response = await fetch(url);
 
     if (!response.ok) {
+        if (response.status === 401) {
+            throw new Error(t('errors.loginRequired'));
+        }
         throw new Error(`HTTP error! status ${response.status}`);
     }
 
