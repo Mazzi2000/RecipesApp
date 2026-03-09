@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from database import get_db_connection
+from extensions import limiter
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
 
@@ -15,6 +16,7 @@ class User(UserMixin):
 # --- Auth routes ---
 
 @auth_bp.route('/login', methods=['POST'])
+@limiter.limit("5 per minute", error_message="To many login attempts. Please wait a minute.")
 def login():
     data = request.get_json()
 

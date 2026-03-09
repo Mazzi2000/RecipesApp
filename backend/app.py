@@ -1,19 +1,37 @@
 from flask import Flask, jsonify, abort, request, send_from_directory
 from flask_login import LoginManager
+from extensions import limiter
 from routes.recipes import recipes_bp
 from routes.statistics import statistics_bp
 from routes.meal_plans import meal_plans_bp
 from routes.auth import auth_bp, User
 from routes.favorites import favorites_bp
 from database import get_db_connection
+from datetime import timedelta
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
 
 app = Flask(__name__)
+
 app.config['JSON_AS_ASCII'] = False
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-fallback-key')
+
+secret_key = os.environ.get('SECRET_KEY')
+if not secret_key:
+    raise RuntimeError(
+        "SECRET_KEY is not set! "
+        "Generate one: python3 -c \"import secrets; print(secrets.token_hex(32))\" "
+        "Then add to .env: SECRET_KEY=your_generated_key"
+    )
+app.config['SECRET_KEY'] = secret_key
+
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+# app.config['SESSION_COOKIE_SECURE'] = True    # I will uncomment when will be HTTPS
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=2)
+
+limiter.init_app(app)
 
 # Flask login setup
 login_manager = LoginManager()
@@ -64,6 +82,22 @@ with app.app_context():
     ''')
     conn.commit()
     conn.close()
+
+@app.after_request
+def set_security_headers(response):
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+
+    if request.path.startswith('/api/'):
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+
+    return response
+
+@app.errorhandler(429)
+def rate_limit_error(error):
+    return jsonify({'error': str(error.description)}), 429
 
 
 @app.errorhandler(404)
