@@ -37,7 +37,7 @@ let isAuthenticated = false;
 let currentUser = null;
 let favoriteIds = new Set();
 let previousView = 'recipes'; // 'recipes' or 'favorites'
-let savedScrollPosition
+let savedScrollPosition = 0;
 
 
 // Pagination state
@@ -512,10 +512,11 @@ function addMealCardListeners() {
 }
 
 function addRecipeCardListeners(){
-    const cards = recipesListEl.querySelectorAll('[data-recipe-id]');
+    const cards = recipesListEl.querySelectorAll('article[data-recipe-id]');
 
     cards.forEach(card => {
-        card.addEventListener('click', () =>{
+        card.addEventListener('click', (e) =>{
+            if (e.target.closest('[data-action="toggle-favorite"]')) return;
             const recipeId = card.dataset.recipeId
             showRecipeDetail(recipeId);
         });
@@ -700,7 +701,6 @@ async function handleRemoveMeal(mealId) {
 async function showRecipeDetail(recipeId){
     try {
         savedScrollPosition = window.scrollY;
-
         recipeDetailEl.classList.remove('hidden');
         recipeDetailEl.innerHTML = `<p class="text-center">${t('app.loading')}</p>`;
 
@@ -756,6 +756,12 @@ function showRecipesView() {
     document.getElementById('planner-view').classList.add('hidden');
     document.getElementById('favorites-view').classList.add('hidden');
     showRecipesList();
+
+    // Re-render to reflect any favorite changes
+    if (recipesCache) {
+        renderRecipesList(recipesCache);
+    }
+
 }
 
 function showPlannerView() {
