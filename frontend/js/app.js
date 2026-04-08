@@ -37,6 +37,7 @@ let isAuthenticated = false;
 let currentUser = null;
 let favoriteIds = new Set();
 let previousView = 'recipes'; // 'recipes' or 'favorites'
+let savedScrollPosition
 
 
 // Pagination state
@@ -698,6 +699,8 @@ async function handleRemoveMeal(mealId) {
  */
 async function showRecipeDetail(recipeId){
     try {
+        savedScrollPosition = window.scrollY;
+
         recipeDetailEl.classList.remove('hidden');
         recipeDetailEl.innerHTML = `<p class="text-center">${t('app.loading')}</p>`;
 
@@ -730,6 +733,11 @@ function showRecipesList(){
     filtersEl.classList.remove('hidden');
     paginationEl.classList.remove('hidden');
     document.getElementById('search-container').classList.remove('hidden');
+
+    // Restore scroll position after DOM is visible
+    requestAnimationFrame(() => {
+        window.scrollTo(0, savedScrollPosition);
+    });
 }
 
 async function loadMealPlan() {
