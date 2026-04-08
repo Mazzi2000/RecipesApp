@@ -60,14 +60,6 @@ def serve_index():
 def serve_static(filename):
     return send_from_directory(FRONTEND_FOLDER, filename)
 
-@app.route('/api/debug-ip')
-def debug_ip():
-    return jsonify({
-        'remote_addr': request.remote_addr,
-        'x_forwarded_for': request.headers.get('X-Forwarded-For'),
-        'x_real_ip': request.headers.get('X-Real-IP')
-    })
-
 app.register_blueprint(recipes_bp)
 app.register_blueprint(statistics_bp)
 app.register_blueprint(meal_plans_bp)
