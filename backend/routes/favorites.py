@@ -8,19 +8,38 @@ favorites_bp = Blueprint('favorites', __name__)
 @favorites_bp.route("/api/favorites")
 @login_required
 def get_favorites():
-    """Get all favorite recipes for the current user."""
+    """Get favorite recipes for the current user, paginated."""
+    page = request.args.get('page', 1, type=int)
+    per_page = min(request.args.get('per_page', 20, type=int), 100)
+
     conn = get_db_connection()
     cursor = conn.cursor()
- 
+
+    total = cursor.execute(
+        'SELECT COUNT(*) FROM favorites WHERE user_id = ?',
+        (current_user.id,)
+    ).fetchone()[0]
+
+    total_pages = max(1, (total + per_page - 1) // per_page)
+    page = max(1, min(page, total_pages))
+    offset = (page - 1) * per_page
+
     rows = cursor.execute('''
         SELECT r.* FROM recipes r
         JOIN favorites f ON r.id = f.recipe_id
         WHERE f.user_id = ?
         ORDER BY f.created_at DESC
-    ''', (current_user.id,)).fetchall()
- 
+        LIMIT ? OFFSET ?
+    ''', (current_user.id, per_page, offset)).fetchall()
+
     conn.close()
-    return jsonify([dict(row) for row in rows])
+    return jsonify({
+        "recipes": [dict(row) for row in rows],
+        "page": page,
+        "per_page": per_page,
+        "total": total,
+        "total_pages": total_pages
+    })
  
  
 @favorites_bp.route("/api/favorites/ids")

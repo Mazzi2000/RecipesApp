@@ -94,6 +94,9 @@ function createRecipeCard(recipe) {
             <div class="flex gap-2 mb-3">
                 <span class="text-xs bg-blue-600 px-2 py-1 rounded">${getCategoryLabelNoEmoji(recipe.category)}</span>
                 <span class="text-xs bg-gray-700 px-2 py-1 rounded">⏱️ ${recipe.prep_time_minutes || '?'} min</span>
+                <button data-action="add-meal" data-meal-type="" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer">
+                        +${t('mealPlan.addMeal')}
+                    </button>
             </div>
 
             <div class="text-sm text-gray-400">

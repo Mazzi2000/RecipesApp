@@ -50,7 +50,14 @@ def load_user(user_id):
 def unauthorized():
     return jsonify({'error': 'Authentication required'}), 401
 
-FRONTEND_FOLDER = os.path.join(os.path.dirname(__file__), '..', 'frontend')
+REACT_DIST = os.path.join(os.path.dirname(__file__), '..', 'frontend-react', 'dist')
+LEGACY_FRONTEND = os.path.join(os.path.dirname(__file__), '..', 'frontend')
+
+# Serve React build if it exists, otherwise fall back to vanilla frontend
+if os.path.isdir(REACT_DIST):
+    FRONTEND_FOLDER = REACT_DIST
+else:
+    FRONTEND_FOLDER = LEGACY_FRONTEND
 
 @app.route("/")
 def serve_index():
@@ -58,6 +65,12 @@ def serve_index():
 
 @app.route("/<path:filename>")
 def serve_static(filename):
+    # For React Router: if the file doesn't exist, serve index.html (client-side routing)
+    full_path = os.path.join(FRONTEND_FOLDER, filename)
+    if os.path.isfile(full_path):
+        return send_from_directory(FRONTEND_FOLDER, filename)
+    if FRONTEND_FOLDER == REACT_DIST:
+        return send_from_directory(FRONTEND_FOLDER, 'index.html')
     return send_from_directory(FRONTEND_FOLDER, filename)
 
 app.register_blueprint(recipes_bp)

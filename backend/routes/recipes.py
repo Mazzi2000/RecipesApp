@@ -227,6 +227,91 @@ def remove_recipe(recipe_id):
         conn.close()
 
 
+@recipes_bp.route("/api/recipes/<int:recipe_id>", methods=['PUT'])
+@login_required
+def update_recipe(recipe_id):
+    data = request.get_json()
+
+    if not data:
+        return jsonify({'error': 'No JSON data'}), 400
+
+    if not data.get('name'):
+        return jsonify({'error': 'Missing required field: name'}), 400
+
+    if data.get('category') and data['category'] not in VALID_CATEGORIES:
+        return jsonify({'error': 'Invalid category', 'valid_categories': VALID_CATEGORIES}), 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    existing = cursor.execute('SELECT id FROM recipes WHERE id = ?', (recipe_id,)).fetchone()
+    if existing is None:
+        conn.close()
+        return jsonify({'error': 'Recipe not found'}), 404
+
+    try:
+        cursor.execute('''
+            UPDATE recipes SET
+                name = ?, description = ?, category = ?, image_url = ?, source_url = ?,
+                difficulty = ?, prep_time_minutes = ?, total_time_minutes = ?,
+                servings = ?, instructions = ?, notes = ?, tags = ?,
+                calories_per_serving = ?, protein_per_serving = ?, fat_per_serving = ?,
+                carbs_per_serving = ?, sodium_per_serving = ?, fiber_per_serving = ?
+            WHERE id = ?
+        ''', (
+            data['name'],
+            data.get('description'),
+            data.get('category') or None,
+            data.get('image_url'),
+            data.get('source_url'),
+            data.get('difficulty'),
+            data.get('prep_time_minutes'),
+            data.get('total_time_minutes'),
+            data.get('servings', 1),
+            json.dumps(data.get('instructions', [])),
+            data.get('notes'),
+            json.dumps(data.get('tags', [])),
+            data.get('calories_per_serving', 0),
+            data.get('protein_per_serving', 0),
+            data.get('fat_per_serving', 0),
+            data.get('carbs_per_serving', 0),
+            data.get('sodium_per_serving', 0),
+            data.get('fiber_per_serving', 0),
+            recipe_id,
+        ))
+
+        cursor.execute('DELETE FROM ingredients WHERE recipe_id = ?', (recipe_id,))
+        for ing in data.get('ingredients', []):
+            cursor.execute('''
+                INSERT INTO ingredients (recipe_id, name, amount, unit, notes, original_text)
+                VALUES (?, ?, ?, ?, ?, ?)
+            ''', (
+                recipe_id,
+                ing.get('name', ''),
+                ing.get('amount', 0),
+                ing.get('unit', ''),
+                ing.get('notes'),
+                ing.get('original_text'),
+            ))
+
+        cursor.execute('DELETE FROM recipe_categories WHERE recipe_id = ?', (recipe_id,))
+        for cat in data.get('recipe_categories', []):
+            cursor.execute(
+                'INSERT INTO recipe_categories (recipe_id, category_name) VALUES (?, ?)',
+                (recipe_id, cat)
+            )
+
+        conn.commit()
+        return jsonify({'id': recipe_id, 'message': 'Recipe updated successfully'})
+
+    except Exception as e:
+        conn.rollback()
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        conn.close()
+
+
 @recipes_bp.route("/api/recipe-tags")
 def get_all_tags():
     """Return all unique recipe category tags for filtering."""
