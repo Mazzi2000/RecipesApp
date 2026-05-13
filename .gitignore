@@ -17,3 +17,6 @@ venv/
 
 #VSC
 .vscode
+
+data/res_recipes.json
+data/res_recipes_2.json
