@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api/client';
-import { qk } from '@/lib/query/keys';
 import { LoginResponseSchema, type LoginRequest } from '@/lib/api/schemas';
 
 export function useLogin() {
