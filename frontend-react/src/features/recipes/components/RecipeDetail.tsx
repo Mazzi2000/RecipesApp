@@ -78,7 +78,7 @@ export function RecipeDetail({ recipe }: RecipeDetailProps) {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">{t('recipeDetail.ingredients')}</h2>
+        <h2 className="text-lg font-semibold">{t('recipeDetail.ingredientsPerServings')}{recipe.servings}</h2>
         <Card>
           <CardContent className="p-4">
             <IngredientList ingredients={recipe.ingredients} />

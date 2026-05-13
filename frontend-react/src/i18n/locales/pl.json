@@ -37,6 +37,7 @@
   },
   "recipeDetail": {
     "ingredients": "Składniki",
+    "ingredientsPerServings": "Składniki na porcje: ",
     "instructions": "Przygotowanie",
     "noInstructions": "Brak instrukcji",
     "nutritionPerServing": "Wartości odżywcze (na 1 porcję)"

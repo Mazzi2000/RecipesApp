@@ -37,6 +37,7 @@
   },
   "recipeDetail": {
     "ingredients": "Ingredients",
+    "ingredientsPerServings": "Ingredients per servings: ",
     "instructions": "Instructions",
     "noInstructions": "No instructions",
     "nutritionPerServing": "Nutritional values (per 1 serving)"
