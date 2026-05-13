@@ -2,10 +2,12 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api/client';
 import { qk, type RecipeListFilters } from '@/lib/query/keys';
 import { RecipeListResponseSchema, type RecipeListResponse } from '@/lib/api/schemas';
+import { useAuth } from '@/features/auth/context/AuthContext';
 
 const DEFAULT_PER_PAGE = 20;
 
 export function useRecipes(filters: RecipeListFilters) {
+  const { isAuthenticated } = useAuth();
   const page = filters.page ?? 1;
   const perPage = filters.perPage ?? DEFAULT_PER_PAGE;
 
@@ -25,6 +27,7 @@ export function useRecipes(filters: RecipeListFilters) {
         },
         RecipeListResponseSchema,
       ),
+    enabled: isAuthenticated,
     placeholderData: (prev) => prev,
   });
 }

@@ -9,7 +9,7 @@ export function useLogin() {
     mutationFn: (input: LoginRequest) =>
       api('/auth/login', { method: 'POST', body: input }, LoginResponseSchema),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: qk.auth });
+      void queryClient.invalidateQueries();
     },
   });
 }

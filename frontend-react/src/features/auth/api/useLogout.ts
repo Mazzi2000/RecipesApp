@@ -7,6 +7,7 @@ export function useLogout() {
     mutationFn: () => api<{ message: string }>('/auth/logout', { method: 'POST' }),
     onSuccess: () => {
       queryClient.clear();
+      window.location.reload();
     },
   });
 }
