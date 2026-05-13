@@ -18,7 +18,7 @@ export const qk = {
   favorites: {
     all: ['favorites'] as const,
     ids: ['favorites', 'ids'] as const,
-    list: (page: number) => ['favorites', 'list', page] as const,
+    list: (filters: { page: number; search?: string | null }) => ['favorites', 'list', filters] as const,
   },
   mealPlan: (date: string) => ['meal-plan', date] as const,
 };

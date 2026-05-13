@@ -11,26 +11,35 @@ def get_favorites():
     """Get favorite recipes for the current user, paginated."""
     page = request.args.get('page', 1, type=int)
     per_page = min(request.args.get('per_page', 20, type=int), 100)
+    search = request.args.get('search', '').strip()
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
+    conditions = ['f.user_id = ?']
+    params = [current_user.id]
+    if search:
+        conditions.append('r.name LIKE ?')
+        params.append(f'%{search}%')
+
+    where = ' AND '.join(conditions)
+
     total = cursor.execute(
-        'SELECT COUNT(*) FROM favorites WHERE user_id = ?',
-        (current_user.id,)
+        f'SELECT COUNT(*) FROM favorites f JOIN recipes r ON r.id = f.recipe_id WHERE {where}',
+        params
     ).fetchone()[0]
 
     total_pages = max(1, (total + per_page - 1) // per_page)
     page = max(1, min(page, total_pages))
     offset = (page - 1) * per_page
 
-    rows = cursor.execute('''
+    rows = cursor.execute(f'''
         SELECT r.* FROM recipes r
         JOIN favorites f ON r.id = f.recipe_id
-        WHERE f.user_id = ?
+        WHERE {where}
         ORDER BY f.created_at DESC
         LIMIT ? OFFSET ?
-    ''', (current_user.id, per_page, offset)).fetchall()
+    ''', params + [per_page, offset]).fetchall()
 
     conn.close()
     return jsonify({
