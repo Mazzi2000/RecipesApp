@@ -79,7 +79,7 @@ export function RecipeDetail({ recipe, returnTo }: RecipeDetailProps) {
       </section>
       <div className="grid gap-4 md:grid-cols-3">
         <section className="space-y-3 md:col-span-2">
-          <h2 className="text-lg font-semibold">{t('recipeDetail.instructions')}</h2>
+          <h2 className="text-lg font-semibold">{t('recipeDetail.instructions')} {recipe.prep_time_minutes != null && `(${recipe.prep_time_minutes} ${t('addRecipeForm.minutes')})`}</h2>
           <Card className="border-4 border-pink-500">
             <CardContent className="space-y-2 p-4 text-sm">
               {recipe.instructions && recipe.instructions.length > 0 ? (

@@ -52,6 +52,12 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
                   {formatNumber(recipe.protein_per_serving)}g {t('nutrition.protein')}
                 </>
               )}
+              {recipe.prep_time_minutes != null && (
+                <>
+                  {' · '}
+                  {recipe.prep_time_minutes} {t('addRecipeForm.minutes')}
+                </>
+              )}
             </p>
           ) : null}
         </CardContent>

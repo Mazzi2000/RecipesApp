@@ -80,6 +80,7 @@
     "category": "Category",
     "chooseCategory": "Choose...",
     "prepTime": "Preparation time (min)",
+    "minutes": "minutes",
     "prepTimePlaceholder": "e.g. 15",
     "nutritionPerServing": "Nutritional values (per 1 serving)",
     "calories": "Calories",
