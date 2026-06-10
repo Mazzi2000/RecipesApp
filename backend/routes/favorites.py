@@ -12,20 +12,26 @@ def get_favorites():
     page = request.args.get('page', 1, type=int)
     per_page = min(request.args.get('per_page', 20, type=int), 100)
     search = request.args.get('search', '').strip()
+    tag = request.args.get('tag', '').strip()
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
+    base_join = 'favorites f JOIN recipes r ON r.id = f.recipe_id'
     conditions = ['f.user_id = ?']
     params = [current_user.id]
     if search:
         conditions.append('r.name LIKE ?')
         params.append(f'%{search}%')
+    if tag:
+        base_join += ' JOIN recipe_categories rc ON r.id = rc.recipe_id'
+        conditions.append('rc.category_name = ?')
+        params.append(tag)
 
     where = ' AND '.join(conditions)
 
     total = cursor.execute(
-        f'SELECT COUNT(*) FROM favorites f JOIN recipes r ON r.id = f.recipe_id WHERE {where}',
+        f'SELECT COUNT(*) FROM {base_join} WHERE {where}',
         params
     ).fetchone()[0]
 
@@ -36,6 +42,7 @@ def get_favorites():
     rows = cursor.execute(f'''
         SELECT r.* FROM recipes r
         JOIN favorites f ON r.id = f.recipe_id
+        {f"JOIN recipe_categories rc ON r.id = rc.recipe_id" if tag else ""}
         WHERE {where}
         ORDER BY f.created_at DESC
         LIMIT ? OFFSET ?

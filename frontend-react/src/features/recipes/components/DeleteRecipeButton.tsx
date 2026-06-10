@@ -17,9 +17,10 @@ import { useDeleteRecipe } from '@/features/recipes/api/useDeleteRecipe';
 interface Props {
   recipeId: number;
   recipeName: string;
+  returnTo?: string;
 }
 
-export function DeleteRecipeButton({ recipeId, recipeName }: Props) {
+export function DeleteRecipeButton({ recipeId, recipeName, returnTo }: Props) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -30,7 +31,7 @@ export function DeleteRecipeButton({ recipeId, recipeName }: Props) {
       await remove.mutateAsync(recipeId);
       toast.success(t('toast.recipeDeleted'));
       setOpen(false);
-      navigate('/');
+      navigate(returnTo ?? '/');
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t('errors.deletingRecipe'));
     }

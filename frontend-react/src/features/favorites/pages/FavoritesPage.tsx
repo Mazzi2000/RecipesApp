@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useFavorites } from '@/features/favorites/api/useFavorites';
 import { RecipeGrid } from '@/features/recipes/components/RecipeGrid';
 import { SearchBar } from '@/features/recipes/components/SearchBar';
+import { TagFilter } from '@/features/recipes/components/TagFilter';
 import { Pagination } from '@/components/common/Pagination';
 import { EmptyState } from '@/components/common/EmptyState';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
@@ -17,6 +18,7 @@ export function FavoritesPage() {
   const filters = useMemo(
     () => ({
       search: params.get('search') ?? '',
+      tag: params.get('tag') ?? '',
       page: Number(params.get('page') ?? '1') || 1,
     }),
     [params],
@@ -38,6 +40,7 @@ export function FavoritesPage() {
   const { data, isLoading, isError } = useFavorites({
     page: filters.page,
     search: filters.search || null,
+    tag: filters.tag || null,
   });
 
   if (isError) {
@@ -48,10 +51,14 @@ export function FavoritesPage() {
     <div className="space-y-6">
       <h2 className="text-lg font-semibold">{t('favorites.title')}</h2>
 
-      <div className="grid gap-3 sm:max-w-md">
+      <div className="flex flex-wrap gap-3">
         <SearchBar
           value={filters.search}
-          onChange={(v) => setParam({ search: v || null })}
+          onChange={(v) => setParam({ search: v || null, page: null })}
+        />
+        <TagFilter
+          value={filters.tag}
+          onChange={(v) => setParam({ tag: v, page: null })}
         />
       </div>
 

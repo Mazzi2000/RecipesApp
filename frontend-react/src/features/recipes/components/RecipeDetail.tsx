@@ -11,9 +11,10 @@ import type { RecipeDetail as RecipeDetailType } from '@/lib/api/schemas';
 
 interface RecipeDetailProps {
   recipe: RecipeDetailType;
+  returnTo?: string;
 }
 
-export function RecipeDetail({ recipe }: RecipeDetailProps) {
+export function RecipeDetail({ recipe, returnTo }: RecipeDetailProps) {
   const { t } = useTranslation();
 
   return (
@@ -48,7 +49,7 @@ export function RecipeDetail({ recipe }: RecipeDetailProps) {
                   </Button>
                 }
               />
-              <DeleteRecipeButton recipeId={recipe.id} recipeName={recipe.name} />
+              <DeleteRecipeButton recipeId={recipe.id} recipeName={recipe.name} returnTo={returnTo} />
             </div>
           </div>
 
@@ -103,7 +104,7 @@ export function RecipeDetail({ recipe }: RecipeDetailProps) {
         </section>
       </div>
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">{t('addRecipeForm.notes')}</h2>
+        {recipe.notes && <h2 className="text-lg font-semibold">{t('addRecipeForm.notes')}</h2>}
         {recipe.notes && 
         <Card>
           <CardContent className="space-y-2 p-4 text-sm">

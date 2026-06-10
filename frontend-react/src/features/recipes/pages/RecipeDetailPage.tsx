@@ -45,7 +45,12 @@ export function RecipeDetailPage() {
         />
       )}
 
-      {recipeQuery.data && <RecipeDetail recipe={recipeQuery.data} />}
+      {recipeQuery.data && (
+        <RecipeDetail
+          recipe={recipeQuery.data}
+          returnTo={(location.state as { from?: string } | null)?.from ?? '/'}
+        />
+      )}
     </div>
   );
 }

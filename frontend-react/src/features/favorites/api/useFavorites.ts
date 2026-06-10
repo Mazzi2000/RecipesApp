@@ -7,16 +7,17 @@ import { useAuth } from '@/features/auth/context/AuthContext';
 interface FavoriteFilters {
   page?: number;
   search?: string | null;
+  tag?: string | null;
 }
 
-export function useFavorites({ page = 1, search = null }: FavoriteFilters = {}) {
+export function useFavorites({ page = 1, search = null, tag = null }: FavoriteFilters = {}) {
   const { isAuthenticated } = useAuth();
   return useQuery<RecipeListResponse>({
-    queryKey: qk.favorites.list({ page, search }),
+    queryKey: qk.favorites.list({ page, search, tag }),
     queryFn: () =>
       api(
         '/favorites',
-        { query: { page, per_page: 20, search: search ?? undefined } },
+        { query: { page, per_page: 20, search: search ?? undefined, tag: tag ?? undefined } },
         RecipeListResponseSchema,
       ),
     enabled: isAuthenticated,

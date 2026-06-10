@@ -11,6 +11,7 @@ import { useStatistics } from '@/features/recipes/api/useStatistics';
 import { useAuth } from '@/features/auth/context/AuthContext';
 import { RecipeGrid } from '@/features/recipes/components/RecipeGrid';
 import { SearchBar } from '@/features/recipes/components/SearchBar';
+import { TagFilter } from '@/features/recipes/components/TagFilter';
 import { AddRecipeDialog } from '@/features/recipes/components/AddRecipeDialog';
 
 export function RecipesPage() {
@@ -23,6 +24,7 @@ export function RecipesPage() {
   const filters = useMemo(
     () => ({
       search: params.get('search') ?? '',
+      tag: params.get('tag') ?? '',
       page: Number(params.get('page') ?? '1') || 1,
     }),
     [params],
@@ -43,6 +45,7 @@ export function RecipesPage() {
 
   const recipesQuery = useRecipes({
     search: filters.search || null,
+    tag: filters.tag || null,
     page: filters.page,
   });
   const statsQuery = useStatistics();
@@ -82,10 +85,14 @@ export function RecipesPage() {
         />
       </div>
 
-      <div className="grid gap-3 sm:max-w-md">
+      <div className="flex flex-wrap gap-3">
         <SearchBar
           value={filters.search}
-          onChange={(v) => setParam({ search: v || null })}
+          onChange={(v) => setParam({ search: v || null, page: null })}
+        />
+        <TagFilter
+          value={filters.tag}
+          onChange={(v) => setParam({ tag: v, page: null })}
         />
       </div>
 
