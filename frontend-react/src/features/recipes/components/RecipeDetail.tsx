@@ -76,32 +76,32 @@ export function RecipeDetail({ recipe }: RecipeDetailProps) {
           carbs={recipe.carbs_per_serving}
         />
       </section>
-
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold">{t('recipeDetail.ingredientsPerServings')}{recipe.servings}</h2>
-        <Card>
-          <CardContent className="p-4">
-            <IngredientList ingredients={recipe.ingredients} />
-          </CardContent>
-        </Card>
-      </section>
-
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold">{t('recipeDetail.instructions')}</h2>
-        <Card>
-          <CardContent className="space-y-2 p-4 text-sm">
-            {recipe.instructions && recipe.instructions.length > 0 ? (
-              <ol className="list-inside list-decimal space-y-2">
-                {recipe.instructions.map((step, idx) => (
-                  <li key={idx}>{step}</li>
-                ))}
-              </ol>
-            ) : (
-              <p className="text-muted-foreground">{t('recipeDetail.noInstructions')}</p>
-            )}
-          </CardContent>
-        </Card>
-      </section>
+      <div className="grid gap-4 md:grid-cols-3">
+        <section className="space-y-3 md:col-span-2">
+          <h2 className="text-lg font-semibold">{t('recipeDetail.instructions')}</h2>
+          <Card className="border-4 border-pink-500">
+            <CardContent className="space-y-2 p-4 text-sm">
+              {recipe.instructions && recipe.instructions.length > 0 ? (
+                <ol className="list-inside list-decimal space-y-2">
+                  {recipe.instructions.map((step, idx) => (
+                    <li key={idx}>{step}</li>
+                  ))}
+                </ol>
+              ) : (
+                <p className="text-muted-foreground">{t('recipeDetail.noInstructions')}</p>
+              )}
+            </CardContent>
+          </Card>
+        </section>
+        <section className="space-y-3">
+          <h2 className="text-lg font-semibold">{t('recipeDetail.ingredientsPerServings')}{recipe.servings}</h2>
+          <Card className="border-4 border-green-500">
+            <CardContent className="p-4">
+              <IngredientList ingredients={recipe.ingredients} />
+            </CardContent>
+          </Card>
+        </section>
+      </div>
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">{t('addRecipeForm.notes')}</h2>
         {recipe.notes && 
