@@ -1,5 +1,4 @@
 export interface RecipeListFilters {
-  category?: string | null;
   search?: string | null;
   tag?: string | null;
   page?: number;

@@ -18,7 +18,6 @@ export function useRecipes(filters: RecipeListFilters) {
         '/recipes',
         {
           query: {
-            category: filters.category ?? undefined,
             search: filters.search ?? undefined,
             tag: filters.tag ?? undefined,
             page,

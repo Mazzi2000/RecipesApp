@@ -99,11 +99,17 @@ export function RecipeDetail({ recipe }: RecipeDetailProps) {
             ) : (
               <p className="text-muted-foreground">{t('recipeDetail.noInstructions')}</p>
             )}
-            {recipe.notes && (
-              <p className="border-t border-border pt-3 text-muted-foreground">{recipe.notes}</p>
-            )}
           </CardContent>
         </Card>
+      </section>
+      <section className="space-y-3">
+        <h2 className="text-lg font-semibold">{t('addRecipeForm.notes')}</h2>
+        {recipe.notes && 
+        <Card>
+          <CardContent className="space-y-2 p-4 text-sm">
+            <p className="text-muted-foreground">{recipe.notes}</p>
+          </CardContent>
+        </Card>}
       </section>
     </article>
   );

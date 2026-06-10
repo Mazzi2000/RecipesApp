@@ -11,14 +11,7 @@ import { useStatistics } from '@/features/recipes/api/useStatistics';
 import { useAuth } from '@/features/auth/context/AuthContext';
 import { RecipeGrid } from '@/features/recipes/components/RecipeGrid';
 import { SearchBar } from '@/features/recipes/components/SearchBar';
-import { CategoryFilters } from '@/features/recipes/components/CategoryFilters';
 import { AddRecipeDialog } from '@/features/recipes/components/AddRecipeDialog';
-import { CATEGORIES, type Category } from '@/lib/api/schemas';
-
-function parseCategory(value: string | null): Category | null {
-  if (value && (CATEGORIES as readonly string[]).includes(value)) return value as Category;
-  return null;
-}
 
 export function RecipesPage() {
   const { t } = useTranslation();
@@ -29,7 +22,6 @@ export function RecipesPage() {
 
   const filters = useMemo(
     () => ({
-      category: parseCategory(params.get('category')),
       search: params.get('search') ?? '',
       page: Number(params.get('page') ?? '1') || 1,
     }),
@@ -44,14 +36,12 @@ export function RecipesPage() {
         else next.set(key, value);
       }
       // changing filter resets page
-      if ('category' in updates || 'search' in updates) next.delete('page');
       setParams(next, { replace: false });
     },
     [params, setParams],
   );
 
   const recipesQuery = useRecipes({
-    category: filters.category,
     search: filters.search || null,
     page: filters.page,
   });
@@ -98,11 +88,6 @@ export function RecipesPage() {
           onChange={(v) => setParam({ search: v || null })}
         />
       </div>
-
-      <CategoryFilters
-        value={filters.category}
-        onChange={(v) => setParam({ category: v })}
-      />
 
       {recipesQuery.isError ? (
         <EmptyState
