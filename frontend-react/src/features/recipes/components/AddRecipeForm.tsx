@@ -83,7 +83,7 @@ function buildDefaultValues(initial?: Partial<RecipeDetail>): FormValues {
     servings: initial.servings ?? 1,
     notes: initial.notes ?? '',
     instructionsText: (initial.instructions ?? []).join('\n'),
-    tagsText: (initial.tags ?? []).join(', '),
+    tagsText: ((initial.recipe_categories?.length ? initial.recipe_categories : initial.tags) ?? []).join(', '),
     ingredients:
       initial.ingredients && initial.ingredients.length > 0
         ? initial.ingredients.map((i) => ({
