@@ -9,7 +9,6 @@ import { IngredientList } from './IngredientList';
 import { NutritionPanel } from './NutritionPanel';
 import type { RecipeDetail as RecipeDetailType } from '@/lib/api/schemas';
 
-
 interface RecipeDetailProps {
   recipe: RecipeDetailType;
   returnTo?: string;
