@@ -74,12 +74,15 @@
     "servingsError": "Error changing servings"
   },
   "addRecipeForm": {
+    "level": "Level",
+    "totalTime": "Total time",
     "title": "Add new recipe",
     "recipeName": "Recipe name",
     "recipeNamePlaceholder": "e.g. Scrambled eggs with tomatoes",
     "category": "Category",
     "chooseCategory": "Choose...",
     "prepTime": "Preparation time (min)",
+    "preparationTime": "Preparation time",
     "minutes": "minutes",
     "prepTimePlaceholder": "e.g. 15",
     "nutritionPerServing": "Nutritional values (per 1 serving)",

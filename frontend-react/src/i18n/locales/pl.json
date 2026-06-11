@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "Przepisy Natalii mówimy: resəpi ;)",
+    "title": "Przepisy Natalii",
     "loading": "Ładowanie...",
     "error": "Błąd"
   },
@@ -74,12 +74,15 @@
     "servingsError": "Błąd zmiany porcji"
   },
   "addRecipeForm": {
+    "level": "Poziom",
+    "totalTime": "Całkowity czas",
     "title": "Dodaj nowy przepis",
     "recipeName": "Nazwa przepisu",
     "recipeNamePlaceholder": "np. Jajecznica z pomidorami",
     "category": "Kategoria",
     "chooseCategory": "Wybierz...",
     "prepTime": "Czas przygotowania (min)",
+    "preparationTime": "Czas przygotowania",
     "minutes": "minut",
     "prepTimePlaceholder": "np. 15",
     "nutritionPerServing": "Wartości odżywcze (na 1 porcję)",

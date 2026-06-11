@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Pencil } from 'lucide-react';
+import { ChartColumn, Pencil, Clock, AlarmClockCheck, ChefHat, CookingPot } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { FavoriteButton } from '@/features/favorites/components/FavoriteButton';
@@ -8,6 +8,7 @@ import { EditRecipeDialog } from './EditRecipeDialog';
 import { IngredientList } from './IngredientList';
 import { NutritionPanel } from './NutritionPanel';
 import type { RecipeDetail as RecipeDetailType } from '@/lib/api/schemas';
+
 
 interface RecipeDetailProps {
   recipe: RecipeDetailType;
@@ -28,6 +29,15 @@ export function RecipeDetail({ recipe, returnTo }: RecipeDetailProps) {
               className="h-full w-full object-cover"
               loading="lazy"
             />
+            {recipe.difficulty != null && (
+              <span className="absolute left-3 top-3 p-2 rounded-xl text-pink-300 font-bold text-xl shadow-lg bg-black/50"><ChartColumn className=" inline mr-1" /> {t('addRecipeForm.level')} : {recipe.difficulty}</span>
+            )}
+            {recipe.total_time_minutes != null && (
+              <span className="absolute left-3 bottom-16 p-2 rounded-xl text-green-300 font-bold text-xl shadow-lg bg-black/50"> <AlarmClockCheck className=" inline mr-1" /> {t('addRecipeForm.totalTime')} - {recipe.total_time_minutes} {t('addRecipeForm.minutes')}</span>
+            )}
+            {recipe.prep_time_minutes != null && (
+              <span className="absolute left-3 bottom-3 p-2 rounded-xl text-blue-300 font-bold text-xl shadow-lg bg-black/50"> <Clock className=" inline mr-1" /> {t('addRecipeForm.preparationTime')} - {recipe.prep_time_minutes} {t('addRecipeForm.minutes')}</span>
+            )}
             <FavoriteButton recipeId={recipe.id} className="absolute right-3 top-3 h-10 w-10" />
           </div>
         )}
@@ -69,7 +79,7 @@ export function RecipeDetail({ recipe, returnTo }: RecipeDetailProps) {
       </Card>
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">{t('recipeDetail.nutritionPerServing')}</h2>
+        <h2 className="text-lg font-semibold"><CookingPot className=" inline mr-1" />{t('recipeDetail.nutritionPerServing')}</h2>
         <NutritionPanel
           calories={recipe.calories_per_serving}
           protein={recipe.protein_per_serving}
@@ -79,13 +89,13 @@ export function RecipeDetail({ recipe, returnTo }: RecipeDetailProps) {
       </section>
       <div className="grid gap-4 md:grid-cols-3">
         <section className="space-y-3 md:col-span-2">
-          <h2 className="text-lg font-semibold">{t('recipeDetail.instructions')} {recipe.prep_time_minutes != null && `(${recipe.prep_time_minutes} ${t('addRecipeForm.minutes')})`}</h2>
+          <h2 className="text-lg font-semibold"> <ChefHat className=" inline mr-1" /> {t('recipeDetail.instructions')}</h2>
           <Card className="border-4 border-pink-500">
             <CardContent className="space-y-2 p-4 text-sm">
               {recipe.instructions && recipe.instructions.length > 0 ? (
                 <ol className="list-inside list-decimal space-y-2">
                   {recipe.instructions.map((step, idx) => (
-                    <li key={idx}>{step}</li>
+                    <li key={idx} className='text-lg'>{step}</li>
                   ))}
                 </ol>
               ) : (

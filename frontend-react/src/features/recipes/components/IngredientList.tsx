@@ -7,10 +7,10 @@ interface IngredientListProps {
 export function IngredientList({ ingredients }: IngredientListProps) {
   if (ingredients.length === 0) return null;
   return (
-    <ul className="space-y-1.5 text-sm">
+    <ul className="space-y-1.5 text-base">
       {ingredients.map((ing, idx) => (
         <li key={ing.id ?? idx} className="flex items-baseline justify-between gap-3">
-          <span>{ing.name}</span>
+          <span>{ing.name} {ing.notes != null && `(${ing.notes})`}</span>
           <span className="text-muted-foreground">
             {ing.amount != null ? `${ing.amount} ${ing.unit ?? ''}`.trim() : (ing.original_text ?? '')}
           </span>
