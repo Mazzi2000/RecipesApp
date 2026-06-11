@@ -35,6 +35,8 @@ const formSchema = z.object({
         name: z.string(),
         amount: z.union([z.string(), z.number()]).optional(),
         unit: z.string().optional(),
+        notes: z.string().optional(),
+        original_text: z.string().optional(),
       }),
     )
     .default([]),
@@ -88,6 +90,8 @@ function buildDefaultValues(initial?: Partial<RecipeDetail>): FormValues {
             name: i.name,
             amount: i.amount != null ? String(i.amount) : '',
             unit: i.unit ?? '',
+            notes: i.notes ?? undefined,
+            original_text: i.original_text ?? undefined,
           }))
         : [{ name: '', amount: '', unit: '' }],
   };
@@ -139,10 +143,12 @@ export function AddRecipeForm({ onSave, isSaving = false, onSuccess, initialValu
       recipe_categories: tags,
       ingredients: values.ingredients
         .filter((ing: { name: string }) => ing.name.trim().length > 0)
-        .map((ing: { name: string; amount?: string | number; unit?: string }) => ({
+        .map((ing: { name: string; amount?: string | number; unit?: string; notes?: string; original_text?: string }) => ({
           name: ing.name.trim(),
           amount: ing.amount === '' || ing.amount == null ? undefined : Number(ing.amount),
           unit: ing.unit?.trim() || undefined,
+          notes: ing.notes || undefined,
+          original_text: ing.original_text || undefined,
         })),
     });
 
