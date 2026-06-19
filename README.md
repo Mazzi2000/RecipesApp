@@ -1,188 +1,152 @@
 # RecipesApp
 
-A full-stack meal planning application for storing recipes, planning daily meals, and tracking nutritional intake.
+A small full-stack web app for storing recipes, planning daily meals, and keeping
+an eye on calories and macros (protein, fat, carbs). It began as a learning project
+and is now used privately by a small group of friends and family.
 
-### Recipe List
+The app is invite-only — there is no public sign-up, and you need an account to use
+almost everything, app is avaiable online.
 
-![Recipe List](docs/screenshots/RecipeListView.png)
+---
 
-_Browse all recipes with category filters (Breakfast, Lunch, Dinner, Snack)_
+## Screenshots
 
-### Meal Planner
+<!-- SCREENSHOT 1 of 3 — Recipe list / home page -->
+![Recipe list](docs/screenshots/recipe-list.png)
+*Browse all recipes and filter by meal type.*
 
-![Meal Planner](docs/screenshots/MealPlannerView.png)
+<!-- SCREENSHOT 2 of 3 — A single recipe's detail page -->
+![Recipe detail](docs/screenshots/recipe-detail.png)
+*Ingredients, instructions, and per-serving nutrition.*
 
-_Plan your daily meals and see total macro summary_
+<!-- SCREENSHOT 3 of 3 — The meal planner -->
+![Meal planner](docs/screenshots/meal-planner.png)
+*Plan a day's meals and see the macro totals add up automatically.*
 
-### Recipe Detail
+---
 
-![Recipe Detail](docs/screenshots/RecipeDetail.png)
+## What it does
 
-_View ingredients, instructions, and nutritional info per serving_
+- **Recipe library** — create, edit, delete, search, and filter recipes by meal
+  type (breakfast, lunch, dinner, snack). Each recipe holds ingredients,
+  instructions, an optional photo, nutrition info, and free-form tags.
+- **Meal planner** — drop recipes into a day's breakfast/lunch/dinner/snack slots
+  with adjustable serving sizes; the app sums the macros for you.
+- **Favorites** — each user has their own favorites (they don't show up to others).
+- **Nutrition tracking** — calories, protein, fat, and carbs per serving.
+- **Bilingual interface** — every label and message exists in English and Polish,
+  switchable on the fly with the EN/PL buttons in the header.
+- **Login required** — accounts are created from the command line on the server;
+  there is no public registration.
 
-## Features
+---
 
-- **Recipe Management** - Create, view, and delete recipes with full CRUD operations
-- **Meal Planning** - Add recipes to daily meal plans with adjustable servings
-- **Nutrition Tracking** - Automatic calculation of calories, protein, fat, and carbs
-- **Category Filtering** - Filter recipes by meal type (breakfast, lunch, dinner, snack)
-- **Internationalization (i18n)** - Full English/Polish language support with runtime switching
-- **Responsive UI** - Mobile-friendly design with Tailwind CSS
+## Tech stack
 
-## Tech Stack
+| Layer    | Technology                                                                 |
+| -------- | -------------------------------------------------------------------------- |
+| Backend  | Python 3.10+, Flask, Flask-Login, Flask-Limiter, SQLite, Gunicorn          |
+| Frontend | React 19, TypeScript, Vite, TanStack Query, React Router, Tailwind CSS v4, Radix UI, i18next |
+| Infra    | AWS EC2 (Ubuntu 24.04), nginx, systemd                                     |
+| CI/CD    | GitHub Actions (lint, tests, build, automatic deploy)                      |
 
-| Layer    | Technology                       |
-| -------- | -------------------------------- |
-| Backend  | Python 3.10+, Flask              |
-| Frontend | Vanilla JavaScript (ES6 Modules) |
-| Database | SQLite                           |
-| Styling  | Tailwind CSS                     |
+> There are two frontends in the repo. `frontend-react/` is the live one.
+> `frontend/` is the original vanilla-JS UI, kept only as a fallback and no longer
+> maintained.
 
-## Architecture
+---
 
-### Backend (REST API)
-
-The backend follows a **modular blueprint architecture**:
-
-- `routes/recipes.py` - Recipe CRUD endpoints
-- `routes/meal_plans.py` - Meal planning endpoints
-- `routes/statistics.py` - Analytics endpoint
-
-### Frontend (Vanilla JS)
-
-The frontend uses **ES6 modules** for code organization:
-
-- `app.js` - Main application logic and UI rendering
-- `api.js` - API client module (fetch wrapper)
-- `modal.js` - Reusable modal component
-- `i18n.js` - Internationalization module
-
-### Key Patterns Used
-
-- **Event Delegation** - Single global click handler for all UI actions
-- **Module Pattern** - Separation of concerns (API, UI, i18n)
-- **Observer Pattern** - Language change subscriptions in i18n module
-- **Client-side Caching** - Recipe data cached to reduce API calls
-
-## API Endpoints
-
-| Method | Endpoint                | Description                                     |
-| ------ | ----------------------- | ----------------------------------------------- |
-| GET    | `/api/recipes`          | List all recipes (optional `?category=` filter) |
-| GET    | `/api/recipes/:id`      | Get recipe with ingredients                     |
-| POST   | `/api/recipes`          | Create new recipe                               |
-| DELETE | `/api/recipes/:id`      | Delete recipe                                   |
-| GET    | `/api/meal-plans?date=` | Get meal plan for date                          |
-| POST   | `/api/meal-plans`       | Add meal to plan                                |
-| PATCH  | `/api/meal-plans/:id`   | Update servings                                 |
-| DELETE | `/api/meal-plans/:id`   | Remove meal from plan                           |
-| GET    | `/api/statistics`       | Get recipe count                                |
-
-## Project Structure
+## Project structure
 
 ```
 RecipesApp/
-├── backend/
-│   ├── app.py                 # Flask application entry point
-│   ├── database.py            # SQLite connection manager
-│   ├── schema.sql             # Database schema
-│   ├── import_recipes.py      # Recipe import utility
-│   └── routes/
-│       ├── recipes.py         # Recipe CRUD endpoints
-│       ├── meal_plans.py      # Meal planning endpoints
-│       └── statistics.py      # Statistics endpoint
-├── frontend/
-│   ├── index.html             # Single page application
-│   ├── css/
-│   │   └── styles.css         # Custom animations
-│   └── js/
-│       ├── app.js             # Main application logic
-│       ├── api.js             # API client module
-│       ├── modal.js           # Modal component
-│       ├── i18n.js            # Internationalization module
-│       └── locales/
-│           ├── en.json        # English translations
-│           └── pl.json        # Polish translations
-├── data/
-│   └── recipes.json           # Sample recipe data
-├── docs/
-│   └── recipe-prompt.md       # AI prompt for recipe formatting
+├── backend/                # Flask API
+│   ├── app.py              # entry point + blueprint registration
+│   ├── database.py         # SQLite connection + init
+│   ├── schema.sql          # database schema
+│   ├── create_user.py      # CLI: add a user account
+│   ├── import_recipes.py   # load the sample recipe data
+│   ├── routes/             # API endpoints (recipes, meal_plans, auth, favorites, statistics)
+│   └── tests/              # pytest API tests
+├── frontend-react/         # React + TypeScript app (the live UI)
+│   └── src/
+├── frontend/               # legacy vanilla-JS UI (fallback only)
+├── data/recipes.json       # sample recipe data
+├── .github/workflows/      # CI/CD pipeline
 └── requirements.txt
 ```
 
-## Getting Started
+---
 
-### Prerequisites
+## Running it locally
 
-- Python 3.10+
+You'll need **Python 3.10+**, **Node.js 20+**, and **Git**.
 
-- pip
-
-### Installation
+**1. Clone and set up the Python environment**
 
 ```bash
-
-# Clone the repository
-
 git clone https://github.com/Mazzi2000/RecipesApp
-
 cd RecipesApp
-
-
-# Install dependencies
-
+python3 -m venv venv
+source venv/bin/activate          # Windows: venv\Scripts\activate
 pip install -r requirements.txt
-
-
-
-# Initialize the database
-
-cd backend
-
-python database.py
-
-
-
-# Import sample recipes (optional)
-
-python import_recipes.py
-
-
-
-# Run the app
-
-python app.py
-
 ```
 
-The app will be available at `http://127.0.0.1:5000`
+**2. Create a `.env` file with a real secret key**
 
-## 🤖 Adding Recipes (AI-Assisted Workflow)
+```bash
+echo "SECRET_KEY=$(python3 -c 'import secrets; print(secrets.token_hex(32))')" > .env
+echo "FLASK_DEBUG=1" >> .env
+```
 
-This app uses a clever workflow to convert messy recipes into structured data:
+The `SECRET_KEY` signs login sessions. Keep it private and never commit `.env`
+(it's already in `.gitignore`).
 
-1. Collect recipes from any source (Instagram, websites, notes)
-2. Use ChatGPT/Claude with the prompt in `docs/recipe-prompt.md`
-3. Save output to `data/recipes.json`
-4. Run `python import_recipes.py`
+**3. Create the database and a user**
 
-The AI automatically categorizes meals, calculates nutrition, and standardizes formats.
+```bash
+cd backend
+python3 database.py                       # creates an empty recipes.db
+python3 create_user.py yourname yourpass  # your login
+python3 import_recipes.py                 # optional: load sample recipes
+cd ..
+```
 
-### Manual
+**4. Start the backend** (terminal 1)
 
-Use the "Add Recipe" button in the UI to create recipes with ingredients and instructions.
+```bash
+FLASK_DEBUG=1 python3 backend/app.py       # runs at http://127.0.0.1:5000
+```
 
-## Internationalization
+**5. Start the frontend** (terminal 2)
 
-The app supports multiple languages with runtime switching:
+```bash
+cd frontend-react
+npm install                                # first time only
+npm run dev                                # runs at http://localhost:5173
+```
 
-- **Default**: English
-- **Available**: English, Polish
-- **Storage**: Language preference saved in localStorage
-- **Implementation**: Custom i18n module with JSON translation files
+Open http://localhost:5173 and log in with the account you made in step 3. Vite
+proxies `/api/*` to the backend automatically, so the two halves talk to each other.
 
-  Switch language using the flags in the header (EN/PL).
+---
+
+## Tests
+
+```bash
+# Backend
+cd backend
+pip install -r requirements-dev.txt
+pytest
+
+# Frontend
+cd frontend-react
+npm test
+```
+
+---
 
 ## Status
 
-🚧 Learning project - actively developed
+Active learning project, used privately. Not intended as a public, multi-user
+service.
