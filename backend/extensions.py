@@ -11,6 +11,6 @@ def get_real_ip():
 
 limiter = Limiter(
     key_func=get_real_ip,
-    default_limits=["300 per day", "100 per hour"],
+    default_limits=["1000 per day", "500 per hour"],
     storage_uri="memory://",
 )

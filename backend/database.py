@@ -2,7 +2,10 @@ import sqlite3
 import os 
 
 # Absolute path
-DATABASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'recipes.db')
+DATABASE = os.environ.get(
+    "DATABASE_PATH",
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), 'recipes.db'),
+)
 SCHEMA = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'schema.sql')
 
 def get_db_connection():
