@@ -20,5 +20,11 @@ export default defineConfig([
     languageOptions: {
       globals: globals.browser,
     },
+    rules: {
+      // shadcn/ui + context files intentionally export helpers alongside
+      // components. This rule only affects dev hot-reload — not the build,
+      // not the tests — so warn instead of failing CI.
+      'react-refresh/only-export-components': 'warn',
+    },
   },
 ]);

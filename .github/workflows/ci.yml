@@ -63,12 +63,11 @@ jobs:
           host: ${{ secrets.EC2_HOST }}      # set these 3 in repo Settings ->
           username: ${{ secrets.EC2_USER }}  # Secrets and variables -> Actions
           key: ${{ secrets.EC2_SSH_KEY }}    # the PRIVATE key (full contents)
+          script_stop: true        # ← abort on first error
           script: |
-            # This is exactly what you do by hand today, just automated.
-            # Adjust the path / venv / restart command to match your server.
-            cd ~/RecipesApp
+            cd /home/ubuntu/RecipesApp
             git pull origin main
             source venv/bin/activate
             pip install -r requirements.txt
             cd frontend-react && npm ci && npm run build && cd ..
-            sudo systemctl restart recipesapp   # your gunicorn service name
+            sudo systemctl restart recipesapp
