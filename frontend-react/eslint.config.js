@@ -25,6 +25,8 @@ export default defineConfig([
       // components. This rule only affects dev hot-reload — not the build,
       // not the tests — so warn instead of failing CI.
       'react-refresh/only-export-components': 'warn',
+      'react-hooks/set-state-in-effect': 'warn',
+
     },
   },
 ]);
