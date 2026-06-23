@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChartColumn, Pencil, Clock, AlarmClockCheck, ChefHat, CookingPot } from 'lucide-react';
+import { ChartColumn, Pencil, Clock, AlarmClockCheck, ChefHat, CookingPot, Plus, Minus } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { FavoriteButton } from '@/features/favorites/components/FavoriteButton';
@@ -16,6 +17,8 @@ interface RecipeDetailProps {
 
 export function RecipeDetail({ recipe, returnTo }: RecipeDetailProps) {
   const { t } = useTranslation();
+  const defaultServings = recipe.servings ?? 1;
+  const [currentServings, setCurrentServings] = useState(defaultServings);
 
   return (
     <article className="space-y-6">
@@ -88,10 +91,34 @@ export function RecipeDetail({ recipe, returnTo }: RecipeDetailProps) {
       </section>
       <div className="grid gap-4 md:grid-cols-3">
         <section className="space-y-3">
-          <h2 className="text-lg font-semibold">{t('recipeDetail.ingredientsPerServings')}{recipe.servings ?? ''}</h2>
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-lg font-semibold">{t('recipeDetail.ingredientsPerServings')}{currentServings}</h2>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-7 w-7"
+                onClick={() => setCurrentServings(s => Math.max(1, s - 1))}
+                disabled={currentServings <= 1}
+              >
+                <Minus className="h-3 w-3" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-7 w-7"
+                onClick={() => setCurrentServings(s => s + 1)}
+              >
+                <Plus className="h-3 w-3" />
+              </Button>
+            </div>
+          </div>
           <Card className="border-4 border-green-500">
             <CardContent className="p-4">
-              <IngredientList ingredients={recipe.ingredients} />
+              <IngredientList
+                ingredients={recipe.ingredients}
+                servingsMultiplier={currentServings / defaultServings}
+              />
             </CardContent>
           </Card>
         </section>
