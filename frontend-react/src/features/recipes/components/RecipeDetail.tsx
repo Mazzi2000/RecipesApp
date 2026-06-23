@@ -87,6 +87,14 @@ export function RecipeDetail({ recipe, returnTo }: RecipeDetailProps) {
         />
       </section>
       <div className="grid gap-4 md:grid-cols-3">
+        <section className="space-y-3">
+          <h2 className="text-lg font-semibold">{t('recipeDetail.ingredientsPerServings')}{recipe.servings ?? ''}</h2>
+          <Card className="border-4 border-green-500">
+            <CardContent className="p-4">
+              <IngredientList ingredients={recipe.ingredients} />
+            </CardContent>
+          </Card>
+        </section>
         <section className="space-y-3 md:col-span-2">
           <h2 className="text-lg font-semibold"> <ChefHat className=" inline mr-1" /> {t('recipeDetail.instructions')}</h2>
           <Card className="border-4 border-pink-500">
@@ -100,14 +108,6 @@ export function RecipeDetail({ recipe, returnTo }: RecipeDetailProps) {
               ) : (
                 <p className="text-muted-foreground">{t('recipeDetail.noInstructions')}</p>
               )}
-            </CardContent>
-          </Card>
-        </section>
-        <section className="space-y-3">
-          <h2 className="text-lg font-semibold">{t('recipeDetail.ingredientsPerServings')}{recipe.servings}</h2>
-          <Card className="border-4 border-green-500">
-            <CardContent className="p-4">
-              <IngredientList ingredients={recipe.ingredients} />
             </CardContent>
           </Card>
         </section>

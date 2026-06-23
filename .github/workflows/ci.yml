@@ -65,6 +65,9 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}    # the PRIVATE key (full contents)
           script_stop: true        # ← abort on first error
           script: |
+            mkdir -p /home/ubuntu/backups
+            [ -f /home/ubuntu/RecipesApp/backend/recipes.db ] && cp /home/ubuntu/RecipesApp/backend/recipes.db /home/ubuntu/backups/pre-deploy-$(date +%Y%m%d-%H%M%S).db
+            find /home/ubuntu/backups -name 'pre-deploy-*.db' | sort | head -n -5 | xargs rm -f
             cd /home/ubuntu/RecipesApp
             git pull origin main
             source venv/bin/activate
