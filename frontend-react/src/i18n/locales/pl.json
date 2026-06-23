@@ -27,7 +27,13 @@
     "loadingRecipe": "Ładowanie przepisu...",
     "errorLoading": "Błąd ładowania przepisu",
     "searchPlaceholder": "Szukaj przepisu...",
-    "protein": "białka"
+    "protein": "białka",
+    "selectMode": "Zaznacz",
+    "cancelSelect": "Anuluj",
+    "selectedCount": "Zaznaczono: {{count}}",
+    "selectAll": "Zaznacz wszystkie na stronie",
+    "deleteSelected": "Usuń zaznaczone",
+    "bulkDeleteConfirm": "Usunąć {{count}} przepisów? Tej operacji nie można cofnąć."
   },
   "nutrition": {
     "kcal": "kcal",

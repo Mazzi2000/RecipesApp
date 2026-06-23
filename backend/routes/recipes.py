@@ -227,6 +227,34 @@ def remove_recipe(recipe_id):
         conn.close()
 
 
+@recipes_bp.route("/api/recipes/bulk-delete", methods=['POST'])
+@login_required
+def bulk_delete_recipes():
+    data = request.get_json()
+    ids = data.get('ids', []) if data else []
+    if not ids or not isinstance(ids, list):
+        return jsonify({'error': 'ids must be a non-empty list'}), 400
+    try:
+        ids = [int(i) for i in ids]
+    except (TypeError, ValueError):
+        return jsonify({'error': 'All ids must be integers'}), 400
+
+    placeholders = ','.join('?' * len(ids))
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(f'DELETE FROM recipe_categories WHERE recipe_id IN ({placeholders})', ids)
+        cursor.execute(f'DELETE FROM ingredients WHERE recipe_id IN ({placeholders})', ids)
+        cursor.execute(f'DELETE FROM recipes WHERE id IN ({placeholders})', ids)
+        conn.commit()
+        return jsonify({'deleted': cursor.rowcount}), 200
+    except Exception as e:
+        conn.rollback()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        conn.close()
+
+
 @recipes_bp.route("/api/recipes/<int:recipe_id>", methods=['PUT'])
 @login_required
 def update_recipe(recipe_id):

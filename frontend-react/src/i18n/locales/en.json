@@ -27,7 +27,13 @@
     "loadingRecipe": "Loading recipe...",
     "errorLoading": "Error loading recipe",
     "searchPlaceholder": "Search for recipe...",
-    "protein": "protein"
+    "protein": "protein",
+    "selectMode": "Select",
+    "cancelSelect": "Cancel",
+    "selectedCount": "{{count}} selected",
+    "selectAll": "Select all on page",
+    "deleteSelected": "Delete selected",
+    "bulkDeleteConfirm": "Delete {{count}} recipes? This cannot be undone."
   },
   "nutrition": {
     "kcal": "kcal",
