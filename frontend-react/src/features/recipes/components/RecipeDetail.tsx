@@ -113,7 +113,7 @@ export function RecipeDetail({ recipe, returnTo }: RecipeDetailProps) {
               </Button>
             </div>
           </div>
-          <Card className="border-4 border-green-500">
+          <Card>
             <CardContent className="p-4">
               <IngredientList
                 ingredients={recipe.ingredients}
@@ -124,12 +124,17 @@ export function RecipeDetail({ recipe, returnTo }: RecipeDetailProps) {
         </section>
         <section className="space-y-3 md:col-span-2">
           <h2 className="text-lg font-semibold"> <ChefHat className=" inline mr-1" /> {t('recipeDetail.instructions')}</h2>
-          <Card className="border-4 border-pink-500">
+          <Card>
             <CardContent className="space-y-2 p-4 text-sm">
               {recipe.instructions && recipe.instructions.length > 0 ? (
-                <ol className="list-inside list-decimal space-y-2">
+                <ol className="space-y-3">
                   {recipe.instructions.map((step, idx) => (
-                    <li key={idx} className='text-lg'>{step}</li>
+                    <li key={idx} className="flex gap-3 text-lg">
+                      <span className="flex-none flex h-7 w-7 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
+                        {idx + 1}
+                      </span>
+                      <span className="leading-relaxed">{step}</span>
+                    </li>
                   ))}
                 </ol>
               ) : (
